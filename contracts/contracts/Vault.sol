@@ -64,6 +64,11 @@ contract Vault {
     ACTIVE_TOKENS[token] = false;
   }
 
+  function updateManager(address newManager) public {
+    require(msg.sender == manager, "only manager can update manager");
+    manager = newManager;
+  }
+
   function deposit(address token, uint amount) public payable {
     require(ACTIVE_TOKENS[token], "token not supported");
     require(amount > 0, "Amount must be non-zero");
