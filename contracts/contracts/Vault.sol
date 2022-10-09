@@ -1,4 +1,5 @@
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract Vault {
   event Swap(address taker, address sellToken, address buyToken, uint sellAmount, uint buyAmount);
@@ -9,7 +10,7 @@ contract Vault {
   address public constant ETH_TOKEN_ADDRESS = 0x0000000000000000000000000000000000000000; 
 
   // Vaults can contain an arbitrary amount of tokens
-  address[] tokens;
+  mapping(address => bool) ACTIVE_TOKENS;
 
   // Track deposits
   // deposits[token][user] = amount;
@@ -55,18 +56,20 @@ contract Vault {
 
   function addToken(address token) public {
     require(msg.sender == manager, "only manager can add tokens");
-    tokens.push(token);
+    ACTIVE_TOKENS[token] = true;
   }
 
-  function removeToken(uint index) public {
+  function disableToken(address token) public {
     require(msg.sender == manager, "only manager can remove tokens");
-    require(IERC20(tokens[index]).balanceOf(address(this)) == 0, "token has an oustanding balance");
-    delete tokens[index];
+    ACTIVE_TOKENS[token] = false;
   }
 
   // amount is the number of LP tokens you want to mint
   // the amount of each token to deposit is calculated from this amount
   function deposit(address token, uint amount) public payable {
+    require(ACTIVE_TOKENS[token], "token not supported");
+    require(amount > 0, "Amount must be non-zero");
+
     if (token == ETH_TOKEN_ADDRESS) {
       require(amount == msg.value, "msg.value must match amount");
     }
@@ -79,7 +82,9 @@ contract Vault {
   // amount is the number of LP tokens you want to burn
   // the amount of each token to withdraw is calculated from this amount
   function withdraw(address token, uint amount) public {
+    require(amount > 0, "Amount must be non-zero");
     require(amount <= deposits[token][msg.sender], "amount exceeds deposited balance");
+
     deposits[token][msg.sender] -= amount;
     if (token == ETH_TOKEN_ADDRESS) {
       payable(msg.sender).transfer(amount);
