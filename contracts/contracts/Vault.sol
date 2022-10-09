@@ -54,18 +54,16 @@ contract Vault {
     manager = _manager;
   }
 
-  function addToken(address token) public {
-    require(msg.sender == manager, "only manager can add tokens");
+  function enableToken(address token) public {
+    require(msg.sender == manager, "only manager can enable tokens");
     ACTIVE_TOKENS[token] = true;
   }
 
   function disableToken(address token) public {
-    require(msg.sender == manager, "only manager can remove tokens");
+    require(msg.sender == manager, "only manager can disable tokens");
     ACTIVE_TOKENS[token] = false;
   }
 
-  // amount is the number of LP tokens you want to mint
-  // the amount of each token to deposit is calculated from this amount
   function deposit(address token, uint amount) public payable {
     require(ACTIVE_TOKENS[token], "token not supported");
     require(amount > 0, "Amount must be non-zero");
@@ -79,8 +77,6 @@ contract Vault {
     deposits[token][msg.sender] = amount;
   }
 
-  // amount is the number of LP tokens you want to burn
-  // the amount of each token to withdraw is calculated from this amount
   function withdraw(address token, uint amount) public {
     require(amount > 0, "Amount must be non-zero");
     require(amount <= deposits[token][msg.sender], "amount exceeds deposited balance");
