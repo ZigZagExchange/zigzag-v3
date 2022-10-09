@@ -9,10 +9,6 @@ contract Vault is ERC20 {
   
   address public constant ETH_TOKEN_ADDRESS = 0x0000000000000000000000000000000000000000; 
 
-  // Track deposits
-  // deposits[token][user] = amount;
-  mapping(address => mapping(address => uint)) deposits;
-
   // The manager of a vault is allowed to sign orders that a vault can execute
   address manager;
 
