@@ -1,16 +1,13 @@
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract Vault {
+contract Vault is ERC20 {
   event Swap(address taker, address sellToken, address buyToken, uint sellAmount, uint buyAmount);
   event CancelOrder(bytes32 orderhash);
   event Deposit(address user, uint amount);
   event Withdraw(address user, uint amount);
   
   address public constant ETH_TOKEN_ADDRESS = 0x0000000000000000000000000000000000000000; 
-
-  // Vaults can contain an arbitrary amount of tokens
-  mapping(address => bool) ACTIVE_TOKENS;
 
   // Track deposits
   // deposits[token][user] = amount;
@@ -50,18 +47,8 @@ contract Vault {
   bytes32 constant internal _EIP712_ORDER_SCHEMA_HASH = 0x7c1c5ef5f9d688960eba9e2ee0515a90f03376e79d5e0fc5dfd7de2e8cc0785b;
   //keccak256("Order(address vault,address sellToken,address buyToken,uint256 sellAmount,uint256 buyAmount,uint256 expirationTimeSeconds)")
 
-  constructor(address _manager) {
+  constructor(address _manager, string memory _name, string memory _symbol) ERC20(_name, _symbol) {
     manager = _manager;
-  }
-
-  function enableToken(address token) public {
-    require(msg.sender == manager, "only manager can enable tokens");
-    ACTIVE_TOKENS[token] = true;
-  }
-
-  function disableToken(address token) public {
-    require(msg.sender == manager, "only manager can disable tokens");
-    ACTIVE_TOKENS[token] = false;
   }
 
   function updateManager(address newManager) public {
@@ -69,47 +56,58 @@ contract Vault {
     manager = newManager;
   }
 
-  function deposit(address token, uint amount) public payable {
-    require(ACTIVE_TOKENS[token], "token not supported");
-    require(amount > 0, "Amount must be non-zero");
+  /////////////////////////////////////////////////////////////////////
+  // The manager can use mintLPToken and burnLPToken to set LP limits 
+  // The LP tokens are then swapped for user funds
 
-    if (token == ETH_TOKEN_ADDRESS) {
-      require(amount == msg.value, "msg.value must match amount");
-    }
-    else {
-      IERC20(token).transferFrom(msg.sender, address(this), amount);
-    }
-    deposits[token][msg.sender] = amount;
+  function mintLPToken(uint amount) public {
+    require(msg.sender == manager, "only manager can mint LP tokens");
+    _mint(address(this), amount);
   }
 
-  function withdraw(address token, uint amount) public {
-    require(amount > 0, "Amount must be non-zero");
-    require(amount <= deposits[token][msg.sender], "amount exceeds deposited balance");
-
-    deposits[token][msg.sender] -= amount;
-    if (token == ETH_TOKEN_ADDRESS) {
-      payable(msg.sender).transfer(amount);
-    }
-    else {
-      IERC20(token).transfer(msg.sender, amount);
-    }
+  function burnLPToken(uint amount) public {
+    require(msg.sender == manager, "only manager can burn LP tokens");
+    _burn(address(this), amount);
   }
 
-  // amount is in the sellToken of the order specifying how much to fill
+  /////////////////////////////////////////////////////////////////////////
+  // SWAP
+  // fillAmount is in the sellToken of the order specifying how much to fill
   // fillAvailable is for transactions where amount exceeds available size. you can choose to fill what's available
-  function swap(Order memory order, bytes memory signature, uint fillAmount, bool fillAvailable) public {
+  // This same function is re-used for LP deposits and withdraws
+  // The manager can use mintLPToken and burnLPToken to set LP limits 
+  // The LP token shares the same address as the vault and can be swapped like any other token
+
+  function swap(Order memory order, bytes memory signature, uint fillAmount, bool fillAvailable) public payable {
+    // validate signature
     bytes32 orderhash = calculateOrderHash(order);
     require(isValidSignature(orderhash, signature), "order signature is invalid");
+
+    // adjust size if the user wants to fill whatever is available
     uint availableSize = order.sellAmount - fills[orderhash];
     if (fillAvailable && fillAmount > availableSize) {
       fillAmount = availableSize;
     } 
     require(fillAmount <= availableSize, "fill amount exceeds available size");
 
-    IERC20(order.sellToken).transfer(msg.sender, fillAmount);
-    IERC20(order.buyToken).transferFrom(msg.sender, address(this), order.buyAmount * fillAmount / order.sellAmount);
+    // send out the sell token
+    if (order.sellToken == ETH_TOKEN_ADDRESS) {
+      payable(msg.sender).transfer(fillAmount);
+    }
+    else {
+      IERC20(order.sellToken).transfer(msg.sender, fillAmount);
+    }
 
-    emit Swap(msg.sender, order.sellToken, order.buyToken, fillAmount, order.buyAmount * fillAmount / order.sellAmount);
+    // transfer in the buy token
+    uint buyFillAmount = order.buyAmount * fillAmount / order.sellAmount;
+    if (order.buyToken == ETH_TOKEN_ADDRESS) {
+      require(msg.value == buyFillAmount, "wrong ETH amount sent with order");
+    }
+    else {
+      IERC20(order.buyToken).transferFrom(msg.sender, address(this), buyFillAmount);
+    }
+
+    emit Swap(msg.sender, order.sellToken, order.buyToken, fillAmount, buyFillAmount);
   }
 
   function cancelOrder(Order memory order) public {
