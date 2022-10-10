@@ -4,8 +4,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract Vault is ERC20 {
   event Swap(address taker, address sellToken, address buyToken, uint sellAmount, uint buyAmount);
   event CancelOrder(bytes32 orderhash);
-  event Deposit(address user, uint amount);
-  event Withdraw(address user, uint amount);
   
   address public constant ETH_TOKEN_ADDRESS = 0x0000000000000000000000000000000000000000; 
 
