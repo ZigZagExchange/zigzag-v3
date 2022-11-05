@@ -32,8 +32,15 @@ contract Vault is ERC20 {
   ////////////////////////////////////////////////////
   // EIP-1271 Smart Contract Signatures
 
-  function isValidSignature(bytes32 digest, bytes memory signature) public view returns (bool) {
+  // This is a convenience function so off-chain signature verifications don't have to worry about 
+  // magic numbers
+  function isValidSignatureNow(bytes32 digest, bytes memory signature) public view returns (bool) {
     return SignatureChecker.isValidSignatureNow(manager, digest, signature);
+  }
+  
+  // EIP-1271 requires isValidSignature to return a magic number if true and 0x00 if false 
+  function isValidSignature(bytes32 digest, bytes memory signature) public view returns (bytes4) {
+    return SignatureChecker.isValidSignatureNow(manager, digest, signature) ? bytes4(0x1626ba7e) : bytes4(0x00000000);
   }
 
 }
