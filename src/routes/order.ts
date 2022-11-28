@@ -52,6 +52,7 @@ export default function orderRouts(app: ZZHttpServer) {
       }
     } catch (e: any) {
       sendErrorMsg(res, `Failed to cancel orders: ${e.message}`)
+      return
     }
 
     const orderResponse: any[] = []
@@ -85,9 +86,9 @@ export default function orderRouts(app: ZZHttpServer) {
     
     if (errorMsg.length > 0) {
       sendErrorMsg(res, errorMsg.join(','))
+    } else {
+      res.status(200)
     }
-
-    res.status(200)
   })
 
   app.post('/v1/order/cancelwithtoken', async (req, res) => {
@@ -105,9 +106,9 @@ export default function orderRouts(app: ZZHttpServer) {
 
     if (errorMsg.length > 0) {
       sendErrorMsg(res, errorMsg.join(','))
+    } else {
+      res.status(200)
     }
-
-    res.status(200)
   })
 
   app.get('/v1/order/quote', async (req, res) => {
@@ -158,6 +159,4 @@ export default function orderRouts(app: ZZHttpServer) {
       sendErrorMsg(res, `Failed to fetch orderbook: ${e.message}`)
     }
   })
-
-
 }

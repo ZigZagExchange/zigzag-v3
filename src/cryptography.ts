@@ -1,5 +1,6 @@
 import { ethers } from 'ethers'
 import { randomBytes } from 'crypto'
+import { redis } from './redisClient'
 
 import type { AnyObject } from './types'
 
@@ -69,7 +70,7 @@ export async function verifyMessage(param: {
   message?: string
   typedData?: AnyObject
   signature: string
-}): Promise<boolean> {
+}) {
   const { message, typedData, provider, signer } = param
   const signature = modifyOldSignature(param.signature)
   let finalDigest: string
@@ -97,22 +98,11 @@ export async function verifyMessage(param: {
   const recoveredAddress = recoverAddress(finalDigest, signature)
   if (addrMatching(recoveredAddress, signer)) return true
 
-  // 2nd try: ON_CHAIN_ALLOWED_SIGNER_CACHE saves previus allowed signer
-  // optimistic assumtion: they are allowed to sign this time again.
-  // The contract does a real signature check anyway
-  const allowedAddress = ON_CHAIN_ALLOWED_SIGNER_CACHE[signer]
-  if (allowedAddress && addrMatching(recoveredAddress, allowedAddress)) return true
+  // 2nd try: Check registered vault address
+  // Requires manual whitelist
+  const vaultSigner = await redis.GET(`vaultsigner:${signer.toLowerCase()}`);
+  if (vaultSigner && addrMatching(recoveredAddress, vaultSigner)) return true
+  console.log(`Expected ${signer}, recovered ${recoveredAddress}`);
 
-  // 3st try: Getting code from deployed smart contract to call 1271 isValidSignature.
-  try {
-    if (await eip1271Check(provider, signer, finalDigest, signature)) {
-      ON_CHAIN_ALLOWED_SIGNER_CACHE[signer] = recoveredAddress
-      return true
-    }
-  } catch (err: any) {
-    console.error(`Failed to check signature on chain: ${err.message}`)
-    return true // better accept orders, as this check is optinal anyway
-  }
-
-  throw new Error('Unauthorized')
+  throw Error('Invalid signature')
 }

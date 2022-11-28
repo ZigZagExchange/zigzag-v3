@@ -6,6 +6,7 @@ import adminRouts from './routes/admin'
 import marketRouts from './routes/markets'
 import tokenRouts from './routes/tokens'
 import orderRouts from './routes/order'
+import vaultRouts from './routes/vault'
 
 export const createHttpServer = (): ZZHttpServer => {
   const expressApp = express() as any as ZZHttpServer
@@ -25,6 +26,7 @@ export const createHttpServer = (): ZZHttpServer => {
   marketRouts(expressApp)
   tokenRouts(expressApp)
   orderRouts(expressApp)
+  vaultRouts(expressApp)
 
   expressApp.listen = (...args: any) => server.listen(...args)
 

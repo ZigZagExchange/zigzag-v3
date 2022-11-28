@@ -257,11 +257,11 @@ export default class API extends EventEmitter {
     user: string,
     orderId: number,
     signature: string
-  ): Promise<boolean> => {
+  ) => {
     await verifyMessage({
       provider: this.ETHERS_PROVIDER as ethers.providers.Provider,
       signer: user,
-      message: `cancelorder2:${this.EVMConfig.serverSettings.chainId}:${orderId}`,
+      message: `cancelorder2:${orderId}`,
       signature
     })
 
@@ -271,20 +271,18 @@ export default class API extends EventEmitter {
       updatevalues
     )
     if (update.rows.length > 0) throw new Error('Order not found')
-    return true
   }
 
   cancelOrderToken = async (
     orderId: number,
     token: string
-  ): Promise<boolean> => {
+  ) => {
     const updatevalues = [orderId, token]
     const update = await this.db.query(
       "DELETE FROM orders WHERE id=$1 AND token=$2 RETURNING id",
       updatevalues
     )
     if (update.rows.length > 0) throw new Error('Order not found')
-    return true
   }
 
   getOrder = async (orderId: number | number[]): Promise<ZZOrder[]> => {
@@ -349,5 +347,20 @@ export default class API extends EventEmitter {
 
     const quote = await this.db.query(query, values)
     return parseSQLResultToZZOrder(quote.rows, signature)
+  }
+
+  addVaultSigner = async (
+    ownerAddress: string,
+    signerAddress: string,
+    signature: string
+  ) => {
+    await verifyMessage({
+      provider: this.ETHERS_PROVIDER as ethers.providers.Provider,
+      signer: signerAddress,
+      message: `addvaultsigner:${ownerAddress.toLowerCase()}`,
+      signature
+    })
+
+    this.redis.SET(`vaultsigner:${signerAddress.toLowerCase()}`, ownerAddress.toLowerCase())
   }
 }
