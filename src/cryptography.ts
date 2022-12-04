@@ -2,12 +2,8 @@ import { ethers } from 'ethers'
 
 import type { AnyObject } from './types'
 
-import { getEthersProvider } from './ethersProvider'
+import { onChainEIP1271Check } from './ethersProvider'
 import { getVaultSigner } from './redisClient'
-
-const VALIDATOR_1271_ABI = [
-  'function isValidSignature(bytes32 hash, bytes signature) view returns (bytes4)'
-]
 
 export function modifyOldSignature(signature: string): string {
   if (signature.slice(-2) === '00') return signature.slice(0, -2).concat('1B')
@@ -33,51 +29,17 @@ function addrMatching(recoveredAddr: string, targetAddr: string) {
   return recoveredAddr.toLowerCase() === targetAddr.toLowerCase()
 }
 
-
-// EIP 1271 check
-// async function eip1271Check(
-//   provider: ethers.providers.Provider,
-//   signer: string,
-//   hash: string,
-//   signature: string
-// ) {
-//   let ethersProvider
-//   if (ethers.providers.Provider.isProvider(provider)) {
-//     ethersProvider = provider
-//   } else {
-//     ethersProvider = new ethers.providers.Web3Provider(provider)
-//   }
-//   const code = await ethersProvider.getCode(signer)
-//   if (code && code !== '0x') {
-//     const contract = new ethers.Contract(
-//       signer,
-//       VALIDATOR_1271_ABI,
-//       ethersProvider
-//     )
-//     return (await contract.isValidSignature(hash, signature)) === '0x1626ba7e'
-//   }
-//   return false
-// }
-
 // you only need to pass one of: typedData or message
 export async function verifyMessage(param: {
-  provider?: ethers.providers.Provider
   signer: string
   message?: string
   typedData?: AnyObject
   signature: string
 }) {
-  let { provider } = param
   const { message, typedData, signer } = param
   const signature = modifyOldSignature(param.signature)
   let finalDigest: string
   
-  if (!provider) {
-    const newProvider: ethers.providers.BaseProvider = getEthersProvider()
-    if (!newProvider) throw new Error('Can not get ethers provider')
-    provider = newProvider
-  }
-
   if (message) {
     finalDigest = ethers.utils.hashMessage(message)
   } else if (typedData) {
@@ -106,6 +68,11 @@ export async function verifyMessage(param: {
   const vaultSigner = await getVaultSigner(signer)
   if (vaultSigner && addrMatching(recoveredAddress, vaultSigner)) return true
   console.log(`Expected ${signer}, recovered ${recoveredAddress}`)
+
+  // 3rd try: Check on chain EIP1271 signature
+  // disabled for now
+  // const isValid = await onChainEIP1271Check(signer, finalDigest, signature)
+  // if (isValid) return true
 
   throw Error('Invalid signature')
 }

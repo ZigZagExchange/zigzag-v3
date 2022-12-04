@@ -50,3 +50,20 @@ export async function verifyTokenInformation(
 export function getEthersProvider(): ethers.providers.BaseProvider {
   return ETHERS_PROVIDER
 }
+
+export async function onChainEIP1271Check(
+  signer: string,
+  hash: string,
+  signature: string
+) {
+  const code = await ETHERS_PROVIDER.getCode(signer)
+  if (code && code !== '0x') {
+    const contract = new ethers.Contract(
+      signer,
+      ['function isValidSignature(bytes32 hash, bytes signature) view returns (bytes4)'],
+      ETHERS_PROVIDER
+    )
+    return (await contract.isValidSignature(hash, signature)) === '0x1626ba7e'
+  }
+  return false
+}
