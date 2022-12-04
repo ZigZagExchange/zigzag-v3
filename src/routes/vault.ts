@@ -3,6 +3,8 @@ import type {
   zzErrorMessage
 } from '../types'
 
+import { addVaultSigner } from '../redisClient'
+
 export default function vaultRouts(app: ZZHttpServer) {
   /* helper functions */
   const sendErrorMsg = (res: any, msg: string) => {
@@ -29,7 +31,7 @@ export default function vaultRouts(app: ZZHttpServer) {
     if (doesNotExist(res, signature, 'signature')) return
 
     try {
-      await app.api.addVaultSigner(ownerAddress, signerAddress, signature)
+      await addVaultSigner(ownerAddress, signerAddress, signature)
       res.status(200)
     } catch (e: any) {
       sendErrorMsg(res, e.message)
@@ -43,7 +45,7 @@ export default function vaultRouts(app: ZZHttpServer) {
     if (doesNotExist(res, signature, 'signature')) return
 
     try {
-      await app.api.addVaultSigner(ownerAddress, signerAddress, signature)
+      await addVaultSigner(ownerAddress, signerAddress, signature)
       res.status(200)
     } catch (e: any) {
       sendErrorMsg(res, e.message)

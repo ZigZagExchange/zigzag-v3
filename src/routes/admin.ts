@@ -3,6 +3,8 @@ import type {
   zzErrorMessage
 } from '../types'
 
+import { setTokenInfo } from '../db'
+
 export default function adminRouts(app: ZZHttpServer) {
   /* helper functions */
   const sendErrorMsg = (res: any, msg: string) => {
@@ -31,7 +33,7 @@ export default function adminRouts(app: ZZHttpServer) {
     if (doesNotExist(res, key, 'key')) return
 
     try {
-      const success = await app.api.setTokenInfo(address, symbol, Number(decimals), name, key)
+      const success = await setTokenInfo(address, symbol, Number(decimals), name, key)
       success ? res.status(200) : res.status(400)
     } catch (e: any) {
       sendErrorMsg(res, e.message)

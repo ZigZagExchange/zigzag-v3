@@ -5,6 +5,8 @@ import type {
   ZZOrder
 } from '../types'
 
+import { getOrder, processOrderEVM, genQuote, getOrderBook } from '../db'
+
 export default function orderRouts(app: ZZHttpServer) {
   /* helper functions */
   const sendErrorMsg = (res: any, msg: string) => {
@@ -30,7 +32,7 @@ export default function orderRouts(app: ZZHttpServer) {
     const ids: number[] = idList.split(',').map((id: string) => Number(id))
 
     try {
-      const orders = await app.api.getOrder(ids)
+      const orders = await getOrder(ids)
       const msg: ZZMessage = {
         op: 'orders',
         args: orders
@@ -43,22 +45,11 @@ export default function orderRouts(app: ZZHttpServer) {
 
   app.post('/v1/order', async (req, res) => {
     const zzOrderList: ZZOrder[] = Array.isArray(req.body.order) ? req.body.order : [req.body.order]
-    const cancelList: any = Array.isArray(req.body.cancel) ? req.body.cancel : [req.body.cancel]
-
-    try {
-      for (let i = 0; i < cancelList.length; i++) {
-        const cancelEntry: [string, number, string] = cancelList[i]
-        await app.api.cancelOrderSignature(...cancelEntry)
-      }
-    } catch (e: any) {
-      sendErrorMsg(res, `Failed to cancel orders: ${e.message}`)
-      return
-    }
 
     const orderResponse: any[] = []
     for (let i = 0; i < zzOrderList.length; i++) {
       try {
-        const orderId = await app.api.processOrderEVM(zzOrderList[i])
+        const orderId = await processOrderEVM(zzOrderList[i])
         orderResponse.push({ orderId })
       } catch (e: any) {
         orderResponse.push({ error: `Failed to place order: ${e.message}` })
@@ -71,46 +62,6 @@ export default function orderRouts(app: ZZHttpServer) {
     res.status(200).json(msg)
   })
 
-  app.post('/v1/order/cancel', async (req, res) => {
-    const cancelList: any = Array.isArray(req.body.cancel) ? req.body.cancel : [req.body.cancel]
-
-    const errorMsg: string[] = []
-    for (let i = 0; i < cancelList.length; i++) {
-      try {
-        const cancelEntry: [string, number, string] = cancelList[i]
-        await app.api.cancelOrderSignature(...cancelEntry)
-      } catch (e: any) {
-        errorMsg.push(`Failed to cancel order ${cancelList?.[i]?.[1]}: ${e.message}`)
-      }
-    }
-    
-    if (errorMsg.length > 0) {
-      sendErrorMsg(res, errorMsg.join(','))
-    } else {
-      res.status(200)
-    }
-  })
-
-  app.post('/v1/order/cancelwithtoken', async (req, res) => {
-    const cancelList: any = Array.isArray(req.body.cancel) ? req.body.cancel : [req.body.cancel]
-
-    const errorMsg: string[] = []
-    for (let i = 0; i < cancelList.length; i++) {
-      try {
-        const cancelEntry: [number, string] = cancelList[i]
-        await app.api.cancelOrderToken(...cancelEntry)
-      } catch (e: any) {
-        errorMsg.push(`Failed to cancel order ${cancelList?.[i]?.[0]}: ${e.message}`)
-      }
-    }
-
-    if (errorMsg.length > 0) {
-      sendErrorMsg(res, errorMsg.join(','))
-    } else {
-      res.status(200)
-    }
-  })
-
   app.get('/v1/order/quote', async (req, res) => {
     const { buyToken, sellToken, sellAmount, buyAmount }: { [key: string]: any } = req.query
     if (doesNotExist(res, buyToken, 'buyToken')) return
@@ -121,7 +72,7 @@ export default function orderRouts(app: ZZHttpServer) {
     }
 
     try {
-      const quote = await app.api.genQuote(buyToken, sellToken, buyAmount, sellAmount, true)
+      const quote = await genQuote(buyToken, sellToken, buyAmount, sellAmount, true)
       const msg: ZZMessage = {
         op: 'quote',
         args: quote
@@ -145,13 +96,13 @@ export default function orderRouts(app: ZZHttpServer) {
 
 
     try {
-      const orderBook = await app.api.getOrderBook(buyToken, sellToken, true)
+      const orderBook = await getOrderBook(buyToken, sellToken, true)
       const msg: ZZMessage = {
         op: 'orderbook',
         args: [orderBook]
       }
       if (both) {
-        const otherSideOrderBook = await app.api.getOrderBook(sellToken, buyToken, true)
+        const otherSideOrderBook = await getOrderBook(sellToken, buyToken, true)
         msg.args.push(otherSideOrderBook)
       }
       res.status(200).json(msg)

@@ -4,6 +4,9 @@ import type {
   ZZMessage
 } from '../types'
 
+import { getTokenInfo } from '../db'
+import { getActiveTokens } from '../redisClient'
+
 export default function tokenRouts(app: ZZHttpServer) {
   /* helper functions */
   const sendErrorMsg = (res: any, msg: string) => {
@@ -25,7 +28,7 @@ export default function tokenRouts(app: ZZHttpServer) {
   /* endpoints */
   app.get('/v1/tokens', async (req, res) => {
     try {
-      const activeTokens = await app.api.getActiveTokens()
+      const activeTokens = await getActiveTokens()
       const msg: ZZMessage = {
         op: 'tokens',
         args: [activeTokens]
@@ -41,7 +44,7 @@ export default function tokenRouts(app: ZZHttpServer) {
     if (doesNotExist(res, token, 'token')) return
 
     try {
-      const tokenInfo = app.api.getTokenInfo(token)
+      const tokenInfo = getTokenInfo(token)
       const msg: ZZMessage = {
         op: 'tokeninfo',
         args: [tokenInfo]
