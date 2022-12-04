@@ -28,7 +28,7 @@ export const createHttpServer = (): ZZHttpServer => {
   orderRouts(expressApp)
   vaultRouts(expressApp)
 
-  expressApp.listen = (...args: any) => server.listen(...args)
+  // expressApp.listen = (...args: any) => server.listen(...args)
 
   return expressApp
 }

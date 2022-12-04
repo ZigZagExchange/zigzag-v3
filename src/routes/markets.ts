@@ -4,6 +4,9 @@ import type {
   ZZMessage
 } from '../types'
 
+import { getMarketInfo } from '../db'
+import { getActiveMarkets } from '../redisClient'
+
 export default function marketRouts(app: ZZHttpServer) {
   /* helper functions */
   const sendErrorMsg = (res: any, msg: string) => {
@@ -26,7 +29,7 @@ export default function marketRouts(app: ZZHttpServer) {
   app.get('/v1/markets', async (req, res) => {
 
     try {
-      const markets = await app.api.getActiveMarkets()
+      const markets = await getActiveMarkets()
       const msg: ZZMessage = {
         op: 'markets',
         args: markets
@@ -44,7 +47,7 @@ export default function marketRouts(app: ZZHttpServer) {
     if (doesNotExist(res, sellToken, 'sellToken')) return
 
     try {
-      const marketInfo = app.api.getMarketInfo(buyToken, sellToken)
+      const marketInfo = getMarketInfo(buyToken, sellToken)
       const msg: ZZMessage = {
         op: 'marketinfo',
         args: [marketInfo]

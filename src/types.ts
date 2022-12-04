@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 import type { Application } from 'express'
-import type API from './api'
 
 export type AnyObject = { [key: string | number]: any }
 
-export type ZZAPITransport = { api: API }
-
-export type ZZHttpServer = Application & ZZAPITransport
+export type ZZHttpServer = Application
 
 export type zzErrorMessage = {
   op: 'error'
