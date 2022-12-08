@@ -6,26 +6,10 @@ import type {
 
 import { getTokenInfo } from '../db'
 import { getActiveTokens } from '../redisClient'
+import { doesNotExist, sendErrorMsg } from './helpers';
 
 export default function tokenRouts(app: ZZHttpServer) {
-  /* helper functions */
-  const sendErrorMsg = (res: any, msg: string) => {
-    const errorMsg: zzErrorMessage = {
-      op: 'error',
-      args: msg
-    }
-    res.status(400).json(errorMsg)
-  }
 
-  const doesNotExist = (res: any, value: any, name: string) => {
-    if (!value) {
-      sendErrorMsg(res, `Missing ${name}`)
-      return true
-    }
-    return false
-  }
-
-  /* endpoints */
   app.get('/v1/tokens', async (req, res) => {
     try {
       const activeTokens = await getActiveTokens()

@@ -4,26 +4,10 @@ import type {
 } from '../types'
 
 import { setTokenInfo } from '../db'
+import { doesNotExist, sendErrorMsg } from './helpers';
 
 export default function adminRouts(app: ZZHttpServer) {
-  /* helper functions */
-  const sendErrorMsg = (res: any, msg: string) => {
-    const errorMsg: zzErrorMessage = {
-      op: 'error',
-      args: msg
-    }
-    res.status(400).json(errorMsg)
-  }
 
-  const doesNotExist = (res: any, value: any, name: string) => {
-    if (!value) {
-      sendErrorMsg(res, `Missing ${name}`)
-      return true
-    }
-    return false
-  }
-
-  /* endpoints */
   app.get('/admin/addtoken', async (req, res) => {
     const { address, name, symbol, decimals, key }: { [key: string]: any } = req.query
     if (doesNotExist(res, address, 'address')) return

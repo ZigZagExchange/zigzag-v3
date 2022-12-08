@@ -6,26 +6,10 @@ import type {
 } from '../types'
 
 import { getOrder, processOrderEVM, genQuote, getOrderBook } from '../db'
+import { doesNotExist, sendErrorMsg } from './helpers';
 
 export default function orderRouts(app: ZZHttpServer) {
-  /* helper functions */
-  const sendErrorMsg = (res: any, msg: string) => {
-    const errorMsg: zzErrorMessage = {
-      op: 'error',
-      args: msg
-    }
-    res.status(400).json(errorMsg)
-  }
 
-  const doesNotExist = (res: any, value: any, name: string) => {
-    if (!value) {
-      sendErrorMsg(res, `Missing ${name}`)
-      return true
-    }
-    return false
-  }
-
-  /* endpoints */
   app.get('/v1/order', async (req, res) => {
     const { idList }: { [key: string]: any } = req.query
     if (doesNotExist(res, idList, 'id')) return
