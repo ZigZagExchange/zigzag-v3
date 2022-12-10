@@ -50,7 +50,7 @@ export default function marketRouts(app: ZZHttpServer) {
       const marketInfo = getMarketInfo(buyToken, sellToken)
       const msg: ZZMessage = {
         op: 'marketinfo',
-        args: [marketInfo]
+        args: marketInfo
       }
       res.status(200).json(msg)
     } catch (e: any) {

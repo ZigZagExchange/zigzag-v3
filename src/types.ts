@@ -12,7 +12,7 @@ export type zzErrorMessage = {
 
 export type ZZMessage = {
   op: string
-  args: any[]
+  args: any
 }
 
 export type ZZTokenInfo = {
