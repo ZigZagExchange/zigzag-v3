@@ -12,7 +12,7 @@ export type zzErrorMessage = {
 
 export type ZZMessage = {
   op: string
-  args: any[]
+  args: any
 }
 
 export type ZZTokenInfo = {
@@ -23,8 +23,8 @@ export type ZZTokenInfo = {
 }
 
 export type ZZMarketInfo = {
-  buyToken: ZZTokenInfo,
-  sellToken: ZZTokenInfo,
+  buyTokenInfo: ZZTokenInfo,
+  sellTokenInfo: ZZTokenInfo,
   exchangeAddress: string,
   contractVersion: string
 }
