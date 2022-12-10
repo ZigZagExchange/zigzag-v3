@@ -165,8 +165,8 @@ export function getMarketInfo(buyToken: string, sellToken: string): ZZMarketInfo
   const sellTokenInfo = getTokenInfo(sellToken)
 
   return {
-    buyToken: buyTokenInfo,
-    sellToken: sellTokenInfo,
+    buyTokenInfo,
+    sellTokenInfo,
     exchangeAddress: EVMConfig.onChainSettings.exchangeAddress,
     contractVersion: EVMConfig.onChainSettings.domain.version
   } as ZZMarketInfo

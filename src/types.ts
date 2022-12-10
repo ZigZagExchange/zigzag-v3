@@ -23,8 +23,8 @@ export type ZZTokenInfo = {
 }
 
 export type ZZMarketInfo = {
-  buyToken: ZZTokenInfo,
-  sellToken: ZZTokenInfo,
+  buyTokenInfo: ZZTokenInfo,
+  sellTokenInfo: ZZTokenInfo,
   exchangeAddress: string,
   contractVersion: string
 }
