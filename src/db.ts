@@ -16,7 +16,7 @@ export const db = new Pool({
   max: 10,
 })
 
-export async function runDbMigration () {
+export async function runDbMigration() {
   console.log('running db migration')
   const migration = fs.readFileSync('schema.sql', 'utf8')
   try {

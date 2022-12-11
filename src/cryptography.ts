@@ -9,6 +9,6 @@ export function modifyOldSignature(signature: string): string {
 // Comparing addresses. targetAddr is already checked upstream
 export function addrMatching(recoveredAddr: string, targetAddr: string) {
   if (recoveredAddr === '') return false
-  if (!ethers.utils.isAddress(recoveredAddr)) return false;
+  if (!ethers.utils.isAddress(recoveredAddr)) return false
   return recoveredAddr.toLowerCase() === targetAddr.toLowerCase()
 }

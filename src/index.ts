@@ -1,4 +1,4 @@
-import expressApp from "./app"
+import expressApp from './app'
 import throng from 'throng'
 
 function start() {
@@ -8,10 +8,11 @@ function start() {
   })
 }
 
-const WORKERS = process.env.WEB_CONCURRENCY ? Number(process.env.WEB_CONCURRENCY) : 1
+const WORKERS = process.env.WEB_CONCURRENCY
+  ? Number(process.env.WEB_CONCURRENCY)
+  : 1
 throng({
   worker: start,
   count: WORKERS,
   lifetime: Infinity,
 })
-

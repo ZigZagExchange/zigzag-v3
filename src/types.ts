@@ -6,15 +6,15 @@ export type AnyObject = { [key: string | number]: any }
 export type ZZHttpServer = Application
 
 export type ZZTokenInfo = {
-  address: string,
-  symbol: string,
-  decimals: number,
+  address: string
+  symbol: string
+  decimals: number
   name: string
 }
 
 export type ZZMarketInfo = {
-  buyToken: string,
-  sellToken: string,
+  buyToken: string
+  sellToken: string
   verified: boolean
 }
 
