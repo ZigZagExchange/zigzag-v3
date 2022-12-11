@@ -211,6 +211,14 @@ describe("Market Info", () => {
     await expect(response.statusCode).toBe(200);
     console.log(response.body);
   });
+
+  test("markets should not repeat", async () => {
+    await expect(false).toBe(true);
+  });
+
+  test("need a method to decide how to determine base vs quote token", async () => {
+    await expect(false).toBe(true);
+  });
 });
 
 afterAll(async () => {
