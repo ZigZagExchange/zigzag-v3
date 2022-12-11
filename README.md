@@ -89,7 +89,7 @@ Base URL: https://api.zigzag.exchange
         "sellToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         "buyAmount": "1200000000000000000000",
         "sellAmount": "1000000000000000000",
-        "expirationTimeSeconds": 1670795578
+        "expirationTimeSeconds": "1670795578"
       },
       "signature": "0x5de9042545420a24abf6ae7729674fa25288f810c9ce39e66e4295fbfc7f0c06499995b04ed90d83100d951c1d66b1ef451b1c0b7b7f7c18023ddea373b5fb2d1b"
     },
@@ -101,7 +101,7 @@ Base URL: https://api.zigzag.exchange
         "sellToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         "buyAmount": "1200000000000000000000",
         "sellAmount": "1000000000000000000",
-        "expirationTimeSeconds": 1670795579
+        "expirationTimeSeconds": "1670795579"
       },
       "signature": "0x882b17fd322e7f9b790dfdb2b2965a942e59464d62152d80152b423d8b6f9aa811a245f34af56fdaded2910867eb3625264dc85690b189dc2dc99d0d418bea4d1c"
     }
@@ -131,21 +131,22 @@ POST /v1/order
 Content-Type: application/json
 
 {
-  order: {
-    user: '0xc3Be2ecf454A5C74c1218949b4526433a9665fA1',
-    buyToken: '0xff970a61a04b1ca14834a43f5de4533ebddb5cc8',
-    sellToken: '0x82af49447d8a07e3bd95bd0d56f35241523fbab1',
-    buyAmount: '1200000000000000000000',
-    sellAmount: '1000000000000000000',
-    expirationTimeSeconds: 1670795578
+  "order": {
+    "user": "0xc3Be2ecf454A5C74c1218949b4526433a9665fA1",
+    "buyToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+    "sellToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    "buyAmount": "1200000000000000000000",
+    "sellAmount": "1000000000000000000",
+    "expirationTimeSeconds": "1670797689"
   },
-  signature: '0x5de9042545420a24abf6ae7729674fa25288f810c9ce39e66e4295fbfc7f0c06499995b04ed90d83100d951c1d66b1ef451b1c0b7b7f7c18023ddea373b5fb2d1b'
+  "signature": "0xe961cf684e0dd4174a0daa48d3d836efed865efebba6a060c080100434eff33e635193154ce4f8857a66068e37eb8c6b92ef65eb4e6c27260034caf58b06c9f61c"
 }
+
 
 
 200 OK
 Access-Control-Allow-Origin: *
 Content-Type: application/json
 
-{ id: 1, hash: '0x7bcad1ceab2751cf380fd000facd079682f95b70a93c1bfbf7230a76fd8eacfc' }
+{ id: 1, hash: "0x7bcad1ceab2751cf380fd000facd079682f95b70a93c1bfbf7230a76fd8eacfc" }
 ```

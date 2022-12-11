@@ -92,7 +92,7 @@ export default function orderRoutes(app: ZZHttpServer) {
         sellToken: row.sell_token,
         buyAmount: row.buyamount,
         sellAmount: row.sellamount,
-        expirationTimeSeconds: row.expires,
+        expirationTimeSeconds: row.expires.toString(),
       },
       signature: row.sig,
     }))

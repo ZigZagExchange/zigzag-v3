@@ -32,7 +32,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -53,7 +53,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const body = { order }
     const response = await request(app)
@@ -71,7 +71,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -90,7 +90,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) - 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) - 20).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -109,7 +109,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) * 10
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) * 10).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -128,7 +128,7 @@ describe("Sending Orders", () => {
       sellToken: USDC,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -147,7 +147,7 @@ describe("Sending Orders", () => {
       sellToken: USDC,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
@@ -165,7 +165,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature, signer: wallet2.address }
@@ -183,7 +183,7 @@ describe("Sending Orders", () => {
       sellToken: WETH,
       buyAmount: ethers.utils.parseEther("1200").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
-      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature, signer: wallet.address }
@@ -207,7 +207,6 @@ describe("Getting orders", () => {
 
   test("buys - successfully", async () => {
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}`)
-    console.log(response.body.orders[0]);
     await expect(response.statusCode).toBe(200);
     await expect(response.body.orders.length > 0).toBe(true)
     await expect(response.body.orders[0].order.user).toBe(wallet.address)
@@ -215,7 +214,8 @@ describe("Getting orders", () => {
     await expect(response.body.orders[0].order.sellToken).toBe(WETH)
     await expect(response.body.orders[0].order.buyAmount).toBe(ethers.utils.parseEther("1200").toString())
     await expect(response.body.orders[0].order.sellAmount).toBe(ethers.utils.parseEther("1").toString())
-    await expect(response.body.orders[0].order.expirationTimeSeconds).toBeGreaterThanOrEqual(Date.now() / 1000 | 0)
+    await expect(typeof response.body.orders[0].order.expirationTimeSeconds).toBe("string")
+    await expect(Number(response.body.orders[0].order.expirationTimeSeconds)).toBeGreaterThanOrEqual(Date.now() / 1000 | 0)
     await expect(response.body.orders[0].signature).toBeTruthy()
   });
 
@@ -250,14 +250,6 @@ describe("Market Info", () => {
   test("get markets", async () => {
     const response = await request(app).get("/v1/markets")
     await expect(response.statusCode).toBe(200);
-  });
-
-  test("markets should not repeat", async () => {
-    await expect(false).toBe(true);
-  });
-
-  test("need a method to decide how to determine base vs quote token", async () => {
-    await expect(false).toBe(true);
   });
 });
 
