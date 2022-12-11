@@ -5,16 +5,6 @@ export type AnyObject = { [key: string | number]: any }
 
 export type ZZHttpServer = Application
 
-export type zzErrorMessage = {
-  op: 'error'
-  args: string
-}
-
-export type ZZMessage = {
-  op: string
-  args: any
-}
-
 export type ZZTokenInfo = {
   address: string,
   symbol: string,
@@ -23,10 +13,8 @@ export type ZZTokenInfo = {
 }
 
 export type ZZMarketInfo = {
-  buyTokenInfo: ZZTokenInfo,
-  sellTokenInfo: ZZTokenInfo,
-  exchangeAddress: string,
-  contractVersion: string
+  token1: ZZTokenInfo,
+  token2: ZZTokenInfo,
 }
 
 export type ZZOrder = {
@@ -36,9 +24,4 @@ export type ZZOrder = {
   sellAmount: number
   buyAmount: number
   expirationTimeSeconds: string
-  signature?: string
-  orderId?: number,
-  unfilled?: number
-  sellAmountParsed?: string
-  buyAmountParsed?: string
 }

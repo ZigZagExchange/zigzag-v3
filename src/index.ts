@@ -1,9 +1,30 @@
 #!/usr/bin/env node
 // SPDX-License-Identifier: BUSL-1.1
-import { createHttpServer } from './httpServer'
 import throng from 'throng'
+import express from 'express'
+import { createServer } from 'http'
+import marketRoutes from './routes/markets'
+import orderRoutes from './routes/order'
+import dotenv from 'dotenv'
 
-const httpServer = createHttpServer()
+dotenv.config()
+
+const expressApp = express() 
+const server = createServer(expressApp)
+
+expressApp.use(express.json())
+
+// CORS
+expressApp.use('/', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*')
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+  res.header('Access-Control-Allow-Methods', 'GET, POST')
+  next()
+})
+
+// Register routes
+marketRoutes(expressApp)
+orderRoutes(expressApp)
 
 function start() {
   const port = Number(process.env.PORT) || 3004

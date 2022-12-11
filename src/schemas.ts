@@ -29,8 +29,4 @@ export const EVMOrderSchema = Joi.object({
     'string.base': `"expirationTimeSeconds" should be a type of 'string'`,
     'any.required': `"expirationTimeSeconds" is a required field`,
   }),
-  signature: Joi.string().required().messages({
-    'string.base': `"signature" should be a type of 'string'`,
-    'any.required': `"signature" is a required field`,
-  }),
 })

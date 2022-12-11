@@ -4,77 +4,60 @@ import type {
   ZZMessage,
   ZZOrder
 } from '../types'
+import { db } from '../db';
+import ethers from 'ethers';
 
-import { getOrder, processOrderEVM, genQuote, getOrderBook } from '../db'
+import { modifyOldSignature, addrMatching } from '../cryptography';
 import { doesNotExist, sendErrorMsg } from './helpers';
 
-export default function orderRouts(app: ZZHttpServer) {
+export default function orderRoutes(app: ZZHttpServer) {
 
   app.post('/v1/order', async (req, res) => {
-    const zzOrderList: ZZOrder[] = Array.isArray(req.body.order) ? req.body.order : [req.body.order]
+    const zzOrder: ZZOrder = req.body.order;
+    let signature: string = req.body.signature;
+    const signer: string = req.body.signer || req.body.order.user;
 
-    const orderResponse: any[] = []
-    for (let i = 0; i < zzOrderList.length; i++) {
-      try {
-        const orderId = await processOrderEVM(zzOrderList[i])
-        orderResponse.push({ orderId })
-      } catch (e: any) {
-        orderResponse.push({ error: `Failed to place order: ${e.message}` })
-      }
-    }
-    const msg: ZZMessage = {
-      op: 'orderack',
-      args: orderResponse
-    }
-    res.status(200).json(msg)
+    // schema validation
+    const inputValidation = EVMOrderSchema.validate(zzOrder)
+    if (inputValidation.error) throw inputValidation.error
+
+    // field validations
+    if (Number(zzOrder.sellAmount) <= 0) throw new Error('sellAmount must be positive')
+    if (Number(zzOrder.buyAmount) <= 0) throw new Error('buyAmount must be positive')
+    if (zzOrder.sellToken.toLowerCase() === zzOrder.buyToken.toLowerCase()) throw new Error(`Can't buy and sell the same token`)
+    if (Number(zzOrder.expirationTimeSeconds) < Date.now() / 1000 + 5000) throw new Error('Expiry time too low. Use at least NOW + 5sec')
+    if (!ethers.utlis.isAddress(zzOrder.user)) throw new Error("order.user is invalid address");
+    if (!ethers.utlis.isAddress(zzOrder.buyToken)) throw new Error("order.buyToken is invalid address");
+    if (!ethers.utlis.isAddress(zzOrder.sellToken)) throw new Error("order.sellToken is invalid address");
+    if (!ethers.utlis.isAddress(signer)) throw new Error("signer is invalid address");
+
+    // signature validation
+    const modifiedSignature = modifyOldSignature(signature);
+    const orderHash = ethers.utils._TypedDataEncoder.hash(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, zzOrder);
+    const recoveredAddress = ethers.utils.recoverAddress(orderHash, modifiedSignature);
+    if (!addrMatching(recoveredAddress, signer)) throw new Error(`Invalid recovered address: ${recoveredAddress}`);
+
+    // store in DB
+    const values: any[] = [ zzOrder.user, zzOrder.buyToken,
+      zzOrder.user,
+      zzOrder.buyToken,
+      zzOrder.sellToken,
+      zzOrder.buyAmount,
+      zzOrder.sellAmount,
+      zzOrder.expirationTimeSeconds,
+      modifiedSignature
+    ]
+    await db.query(
+      "INSERT INTO orders (user_address,buy_token,sell_token,buy_amount,sell_amount,expires,sig) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      values
+    )
+
+    res.status(200).json({ "id": orderHash })
   })
 
-  app.get('/v1/order/quote', async (req, res) => {
-    const { buyToken, sellToken, sellAmount, buyAmount }: { [key: string]: any } = req.query
-    if (doesNotExist(res, buyToken, 'buyToken')) return
-    if (doesNotExist(res, sellToken, 'sellToken')) return
-    if ((!sellAmount && !buyAmount) || (sellAmount && buyAmount)) {
-      sendErrorMsg(res, 'Either set buyAmount or set sellAmount')
-      return
-    }
-
-    try {
-      const quote = await genQuote(buyToken, sellToken, buyAmount, sellAmount, true)
-      const msg: ZZMessage = {
-        op: 'quote',
-        args: quote
-      }
-      res.status(200).json(msg)
-    } catch (e: any) {
-      sendErrorMsg(res, `Failed to generate quote: ${e.message}`)
-    }
-  })
-
-  app.get('/v1/order/orderbook/:tokens', async (req, res) => {
-    const { tokens } = req.params
-    const { both }: { [key: string]: any } = req.query
-    let buyToken: string | undefined
-    let sellToken: string | undefined
-    if (tokens.includes('-')) [buyToken, sellToken] = tokens.split('-')
-    if (tokens.includes('_')) [buyToken, sellToken] = tokens.split('_')
-
-    if (!buyToken || doesNotExist(res, buyToken, 'buyToken')) return
-    if (!sellToken || doesNotExist(res, sellToken, 'sellToken')) return
 
 
-    try {
-      const orderBook = await getOrderBook(buyToken, sellToken, true)
-      const msg: ZZMessage = {
-        op: 'orderbook',
-        args: [orderBook]
-      }
-      if (both) {
-        const otherSideOrderBook = await getOrderBook(sellToken, buyToken, true)
-        msg.args.push(otherSideOrderBook)
-      }
-      res.status(200).json(msg)
-    } catch (e: any) {
-      sendErrorMsg(res, `Failed to fetch orderbook: ${e.message}`)
-    }
-  })
+
+  app.get('/v1/orders', async (req, res) => {
+  });
 }
