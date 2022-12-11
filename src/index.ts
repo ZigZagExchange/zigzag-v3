@@ -28,7 +28,7 @@ orderRoutes(expressApp)
 
 function start() {
   const port = Number(process.env.PORT) || 3004
-  httpServer.listen(port, () => {
+  expressApp.listen(port, () => {
     console.log(`Server listening on port ${port}.`)
   })
 }
@@ -39,3 +39,5 @@ throng({
   count: WORKERS,
   lifetime: Infinity,
 })
+
+export default expressApp

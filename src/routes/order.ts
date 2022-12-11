@@ -1,14 +1,14 @@
+import ethers from 'ethers';
+import fs from 'fs';
 import type {
   ZZHttpServer,
-  zzErrorMessage,
-  ZZMessage,
   ZZOrder
 } from '../types'
 import { db } from '../db';
-import ethers from 'ethers';
-
 import { modifyOldSignature, addrMatching } from '../cryptography';
-import { doesNotExist, sendErrorMsg } from './helpers';
+import { EVMOrderSchema } from '../schemas';
+
+const EVMConfig = JSON.parse(fs.readFileSync('EVMConfig.json', 'utf8'))
 
 export default function orderRoutes(app: ZZHttpServer) {
 
@@ -26,10 +26,10 @@ export default function orderRoutes(app: ZZHttpServer) {
     if (Number(zzOrder.buyAmount) <= 0) throw new Error('buyAmount must be positive')
     if (zzOrder.sellToken.toLowerCase() === zzOrder.buyToken.toLowerCase()) throw new Error(`Can't buy and sell the same token`)
     if (Number(zzOrder.expirationTimeSeconds) < Date.now() / 1000 + 5000) throw new Error('Expiry time too low. Use at least NOW + 5sec')
-    if (!ethers.utlis.isAddress(zzOrder.user)) throw new Error("order.user is invalid address");
-    if (!ethers.utlis.isAddress(zzOrder.buyToken)) throw new Error("order.buyToken is invalid address");
-    if (!ethers.utlis.isAddress(zzOrder.sellToken)) throw new Error("order.sellToken is invalid address");
-    if (!ethers.utlis.isAddress(signer)) throw new Error("signer is invalid address");
+    if (!ethers.utils.isAddress(zzOrder.user)) throw new Error("order.user is invalid address");
+    if (!ethers.utils.isAddress(zzOrder.buyToken)) throw new Error("order.buyToken is invalid address");
+    if (!ethers.utils.isAddress(zzOrder.sellToken)) throw new Error("order.sellToken is invalid address");
+    if (!ethers.utils.isAddress(signer)) throw new Error("signer is invalid address");
 
     // signature validation
     const modifiedSignature = modifyOldSignature(signature);
@@ -59,5 +59,20 @@ export default function orderRoutes(app: ZZHttpServer) {
 
 
   app.get('/v1/orders', async (req, res) => {
+    let { buyToken, sellToken } = req.query;
+    let expires: any = req.query.expires;
+    if (!buyToken) throw new Error('Missing param buyToken');
+    if (!sellToken) throw new Error('Missing param sellToken');
+    if (!expires) expires = (Date.now() / 1000 | 0) + 30;
+    expires = Number(expires);
+
+    const values = [buyToken, sellToken, expires];
+    const select = await db.query(
+      "SELECT * FROM orders WHERE buy_token = $1 AND sell_token = $2 AND expires < $3",
+      values
+    )
+
+    return res.status(200).json({ "orders": select.rows });
+
   });
 }

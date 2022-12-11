@@ -1,4 +1,4 @@
-import { runDbMigration } from './db'
+import { db } from './db';
 
 async function start() {
   console.log('background.ts: Starting')
