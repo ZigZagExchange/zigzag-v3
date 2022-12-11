@@ -1,7 +1,7 @@
 import request from "supertest"
 import { ethers } from "ethers"
 import app from "../src/app"
-import { db } from "../src/db"
+import { db, runDbMigration } from "../src/db"
 import fs from 'fs'
 
 const EVMConfig = JSON.parse(fs.readFileSync('EVMConfig.json', 'utf8'))
@@ -12,9 +12,10 @@ const USDC = "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8";
 const wallet = new ethers.Wallet("0xf1c6a46e12f76cb6d8b5b78f5c2a46dd68d05eaee7ff45f5ed20fa2a5db676ce");
 const wallet2 = new ethers.Wallet("0xa8f70284bf6be99ec73512e00441528be2d020f1f8c0f11ac46d4045517d9346");
 
-afterAll(async () => {
-  await db.query("DELETE FROM orders");
-  await db.query("DELETE FROM token_info");
+beforeAll(async () => {
+  await db.query("DROP TABLE orders");
+  await db.query("DROP TABLE token_info");
+  await runDbMigration()
   
   const values = [WETH, "WETH", "Wrapped Ether", 18];
   const values2 = [USDC, "USDC", "USD Coin", 6];
