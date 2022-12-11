@@ -10,7 +10,7 @@
     "declaration": true,
     "sourceMap": true,
     "inlineSources": true,
-    "types": ["node"],
+    "types": ["node", "jest"],
     "stripInternal": true,
     "incremental": true,
     "skipLibCheck": true,
@@ -19,13 +19,14 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["./src/*"]
-    }  
+    },
+    "noImplicitAny": false
   },
   "include": [
     "src/**/*"
   ],
   "typedocOptions": {
-    "entryPoints": ["./src/app.ts"],
+    "entryPoints": ["./src/index.ts"],
     "readme": "none",
     "out": "apidocs/"
   }

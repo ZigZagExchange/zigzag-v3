@@ -16,8 +16,13 @@ export const db = new Pool({
   max: 10,
 })
 
-console.log('running db migration')
-const migration = fs.readFileSync('schema.sql', 'utf8')
-db.query(migration)
-  .then(() => console.log('finished db migration'))
-  .catch((err: string) => console.error(`Failed to run db migration: ${err}`));
+async function runDbMigration () {
+  console.log('running db migration')
+  const migration = fs.readFileSync('schema.sql', 'utf8')
+  try {
+    await db.query(migration)
+    console.log('finished db migration')
+  } catch (err) {
+    console.error(`Failed to run db migration: ${err}`)
+  }
+}
