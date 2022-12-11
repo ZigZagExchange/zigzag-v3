@@ -154,6 +154,43 @@ describe("Sending Orders", () => {
     await expect(response.statusCode).toBe(200);
   });
 
+  test("with an alternate signer", async () => {
+    const order = {
+      user: wallet.address,
+      buyToken: USDC, 
+      sellToken: WETH,
+      buyAmount: ethers.utils.parseEther("1200").toString(),
+      sellAmount: ethers.utils.parseEther("1").toString(),
+      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+    }
+    const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
+    const body = { order, signature, signer: wallet2.address }
+    const response = await request(app)
+      .post("/v1/order")
+      .set("Content-Type", "application/json")
+      .send(body)
+    await expect(response.statusCode).toBe(200);
+  });
+
+  test("fails with bad alternate signer", async () => {
+    const order = {
+      user: wallet.address,
+      buyToken: USDC, 
+      sellToken: WETH,
+      buyAmount: ethers.utils.parseEther("1200").toString(),
+      sellAmount: ethers.utils.parseEther("1").toString(),
+      expirationTimeSeconds: (Date.now() / 1000 | 0) + 20
+    }
+    const signature = await wallet2._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
+    const body = { order, signature, signer: wallet.address }
+    const response = await request(app)
+      .post("/v1/order")
+      .set("Content-Type", "application/json")
+      .send(body)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err).toBe('Bad signature. You might need the signer field');
+  });
+
 });
 
 describe("Getting orders", () => {
