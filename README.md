@@ -64,9 +64,9 @@ Base URL: https://api.zigzag.exchange
 
 **Query paramaters**:
 
-`buyToken`: Address of token being purchased   
-`sellToken`: Address of token being sold   
-`expires`: (optional) UNIX timestamp of latest expiry you want to see. Defaults to 30 seconds past the current time.    
+* `buyToken`: Address of token being purchased   
+* `sellToken`: Address of token being sold   
+* `expires`: (optional) UNIX timestamp of latest expiry you want to see. Defaults to 30 seconds past the current time.    
 
 **Example:**
 
@@ -110,13 +110,13 @@ Base URL: https://api.zigzag.exchange
 
 **POST JSON parameters**
 
-`order.user`: The address of the user sending the order     
-`order.buyToken`: The address of the token being bought     
-`order.sellToken`: The address of the token being sold     
-`order.buyAmount`: The quantity of buyToken being bought as a uint256 string    
-`order.sellAmount`: The quantity of sellToken being sold as a uint256 string    
-`signature`: Orders must be signed. To generate the signature, use the `domain` and `types` info in `GET /v1/markets`, then use something like [ethers.utils.signTypedData](https://docs.ethers.org/v5/api/signer/#Signer-signTypedData) to generate an EIP-712 signature.     
-`signer`: (optional) Most users will not need this. Smart contracts will usually have a designated signer. They can use this field to pass in the address of the authorized signer for signature verification.   
+* `order.user`: The address of the user sending the order     
+* `order.buyToken`: The address of the token being bought     
+* `order.sellToken`: The address of the token being sold     
+* `order.buyAmount`: The quantity of buyToken being bought as a uint256 string    
+* `order.sellAmount`: The quantity of sellToken being sold as a uint256 string    
+* `signature`: Orders must be signed. To generate the signature, use the `domain` and `types` info in `GET /v1/markets`, then use something like [ethers.utils.signTypedData](https://docs.ethers.org/v5/api/signer/#Signer-signTypedData) to generate an EIP-712 signature.     
+* `signer`: (optional) Most users will not need this. Smart contracts will usually have a designated signer. They can use this field to pass in the address of the authorized signer for signature verification.   
 
 **Example**
 
