@@ -46,7 +46,7 @@ describe("Sending Orders", () => {
     console.log(response.body);
   });
 
-  test("without a signature", async () => {
+  test("fails without a signature", async () => {
     const order = {
       user: wallet.address,
       buyToken: USDC, 
@@ -64,7 +64,7 @@ describe("Sending Orders", () => {
     await expect(response.body.err).toBe('missing signature')
   });
 
-  test("with a bad signature", async () => {
+  test("fails with a bad signature", async () => {
     const order = {
       user: wallet.address,
       buyToken: USDC, 
@@ -83,7 +83,7 @@ describe("Sending Orders", () => {
     await expect(response.body.err).toBe('Bad signature. You might need the signer field');
   });
 
-  test("with an early expiry", async () => {
+  test("fails with an early expiry", async () => {
     const order = {
       user: wallet.address,
       buyToken: USDC, 
@@ -102,7 +102,7 @@ describe("Sending Orders", () => {
     await expect(response.body.err.includes("expirationTimeSeconds")).toBe(true)
   });
 
-  test("with a late expiry", async () => {
+  test("fails with a late expiry", async () => {
     const order = {
       user: wallet.address,
       buyToken: USDC, 
@@ -121,7 +121,7 @@ describe("Sending Orders", () => {
     await expect(response.body.err.includes("expirationTimeSeconds")).toBe(true)
   });
 
-  test("with the same tokens", async () => {
+  test("fails with the same tokens", async () => {
     const order = {
       user: wallet.address,
       buyToken: USDC, 
@@ -219,25 +219,25 @@ describe("Getting orders", () => {
     await expect(response.body.orders[0].signature).toBeTruthy()
   });
 
-  test("without any args", async () => {
+  test("fails without any args", async () => {
     const response = await request(app).get("/v1/orders")
     await expect(response.statusCode).toBe(400);
     await expect(response.body.err).toBe("Missing query arg buyToken")
   });
 
-  test("without sellToken", async () => {
+  test("fails without sellToken", async () => {
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}`)
     await expect(response.statusCode).toBe(400);
     await expect(response.body.err).toBe("Missing query arg sellToken")
   });
 
-  test("without buyToken", async () => {
+  test("fails without buyToken", async () => {
     const response = await request(app).get(`/v1/orders?sellToken=${USDC}`)
     await expect(response.statusCode).toBe(400);
     await expect(response.body.err).toBe("Missing query arg buyToken")
   });
 
-  test("without expires", async () => {
+  test("with expires", async () => {
     const expires = (Date.now() / 1000 | 0) + 100000;
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
     await expect(response.statusCode).toBe(200);
@@ -250,6 +250,22 @@ describe("Market Info", () => {
   test("get markets", async () => {
     const response = await request(app).get("/v1/markets")
     await expect(response.statusCode).toBe(200);
+    await expect(response.body.markets.length).toBeGreaterThanOrEqual(1)
+    await expect(response.body.markets[0].verified).toBe(true)
+    await expect(response.body.markets[0].buyToken).toBeTruthy()
+    await expect(response.body.markets[0].sellToken).toBeTruthy()
+    await expect(response.body.verifiedTokens.length).toBeGreaterThanOrEqual(1)
+    await expect(response.body.verifiedTokens[0].address).toBeTruthy()
+    await expect(response.body.verifiedTokens[0].symbol).toBeTruthy()
+    await expect(response.body.verifiedTokens[0].decimals).toBeGreaterThanOrEqual(6)
+    await expect(response.body.verifiedTokens[0].name).toBeTruthy()
+    await expect(response.body.exchange.exchangeAddress).toBe(EVMConfig.onChainSettings.exchangeAddress)
+    await expect(response.body.exchange.domain).toBeTruthy()
+    await expect(response.body.exchange.domain.verifyingContract).toBe(response.body.exchange.exchangeAddress)
+    await expect(response.body.exchange.makerVolumeFee).toBeGreaterThanOrEqual(0)
+    await expect(response.body.exchange.takerVolumeFee).toBeGreaterThanOrEqual(0)
+    await expect(response.body.exchange.types).toBeTruthy()
+    await expect(response.body.exchange.types.Order).toBeTruthy()
   });
 });
 
