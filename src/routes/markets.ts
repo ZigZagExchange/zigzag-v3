@@ -1,5 +1,7 @@
 import type {
   ZZHttpServer,
+  ZZMarketInfo,
+  ZZTokenInfo
 } from '../types'
 import { db } from '../db';
 
@@ -11,13 +13,13 @@ export default function marketRoutes(app: ZZHttpServer) {
 
     // Mark verified markets
     const verifiedTokenAddresses = selectTokens.rows.map(r => r.token_address.toLowerCase());
-    const markets = selectDistinctMarkets.rows.map(row => ({
+    const markets: ZZMarketInfo[] = selectDistinctMarkets.rows.map(row => ({
       buyToken: row.buy_token,
       sellToken: row.sell_token,
       verified: (verifiedTokenAddresses.includes(row.buy_token) && verifiedTokenAddresses.includes(row.sell_token)),
     }));
 
-    const tokenInfo = selectTokens.rows.map(row => ({
+    const tokenInfo: ZZTokenInfo[] = selectTokens.rows.map(row => ({
       address: row.token_address,
       symbol: row.token_symbol,
       decimals: row.token_decimals,

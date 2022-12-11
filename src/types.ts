@@ -13,8 +13,9 @@ export type ZZTokenInfo = {
 }
 
 export type ZZMarketInfo = {
-  token1: ZZTokenInfo,
-  token2: ZZTokenInfo,
+  buyToken: string,
+  sellToken: string,
+  verified: boolean
 }
 
 export type ZZOrder = {
