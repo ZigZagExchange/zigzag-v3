@@ -49,12 +49,12 @@ export default function orderRoutes(app: ZZHttpServer) {
       zzOrder.expirationTimeSeconds,
       modifiedSignature
     ]
-    await db.query(
-      "INSERT INTO orders (user_address,buy_token,sell_token,buy_amount,sell_amount,expires,sig) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+    const insert = await db.query(
+      "INSERT INTO orders (user_address,buy_token,sell_token,buy_amount,sell_amount,expires,sig) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
       values
     )
 
-    res.status(200).json({ "id": orderHash })
+    res.status(200).json({ "id": insert.rows[0].id, hash: orderHash })
   });
 
 

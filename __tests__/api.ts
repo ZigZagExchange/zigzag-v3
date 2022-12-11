@@ -40,6 +40,8 @@ describe("Sending Orders", () => {
       .set("Content-Type", "application/json")
       .send(body)
     await expect(response.statusCode).toBe(200);
+    await expect(response.body.id).toBeTruthy()
+    await expect(response.body.hash).toBeTruthy()
   });
 
   test("without a signature", async () => {
