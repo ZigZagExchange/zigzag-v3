@@ -43,6 +43,7 @@ describe("Sending Orders", () => {
     await expect(response.statusCode).toBe(200);
     await expect(response.body.id).toBeTruthy()
     await expect(response.body.hash).toBeTruthy()
+    console.log(response.body);
   });
 
   test("without a signature", async () => {
@@ -249,7 +250,6 @@ describe("Market Info", () => {
   test("get markets", async () => {
     const response = await request(app).get("/v1/markets")
     await expect(response.statusCode).toBe(200);
-    console.log(response.body);
   });
 
   test("markets should not repeat", async () => {

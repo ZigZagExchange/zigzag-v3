@@ -1,5 +1,8 @@
+import fs from 'fs'
 import type { ZZHttpServer, ZZMarketInfo, ZZTokenInfo } from '../types'
 import { db } from '../db'
+
+const EVMConfig = JSON.parse(fs.readFileSync('EVMConfig.json', 'utf8'))
 
 export default function marketRoutes(app: ZZHttpServer) {
   app.get('/v1/markets', async (req, res) => {
@@ -30,6 +33,7 @@ export default function marketRoutes(app: ZZHttpServer) {
     const result = {
       markets,
       verifiedTokens: tokenInfo,
+      exchange: EVMConfig.onChainSettings
     }
 
     res.status(200).json(result)
