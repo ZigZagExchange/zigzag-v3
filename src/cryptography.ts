@@ -11,21 +11,10 @@ export function modifyOldSignature(signature: string): string {
   return signature
 }
 
-// Address recovery wrapper
-function recoverAddress(hash: string, signature: string): string {
-  try {
-    return ethers.utils.recoverAddress(hash, signature)
-  } catch {
-    return ''
-  }
-}
-
 // Comparing addresses. targetAddr is already checked upstream
 function addrMatching(recoveredAddr: string, targetAddr: string) {
   if (recoveredAddr === '') return false
-  if (!ethers.utils.isAddress(recoveredAddr))
-    throw new Error(`Invalid recovered address: ${recoveredAddr}`)
-
+  if (!ethers.utils.isAddress(recoveredAddr)) throw new Error(`Invalid recovered address: ${recoveredAddr}`)
   return recoveredAddr.toLowerCase() === targetAddr.toLowerCase()
 }
 
@@ -60,7 +49,7 @@ export async function verifyMessage(param: {
   }
 
   // 1nd try: elliptic curve signature (EOA)
-  const recoveredAddress = recoverAddress(finalDigest, signature)
+  const recoveredAddress = ethers.utils.recoverAddress(finalDigest, signature)
   if (addrMatching(recoveredAddress, signer)) return true
 
   // 2nd try: Check registered vault address

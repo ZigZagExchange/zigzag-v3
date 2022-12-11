@@ -10,23 +10,6 @@ import { doesNotExist, sendErrorMsg } from './helpers';
 
 export default function orderRouts(app: ZZHttpServer) {
 
-  app.get('/v1/order', async (req, res) => {
-    const { idList }: { [key: string]: any } = req.query
-    if (doesNotExist(res, idList, 'id')) return
-    const ids: number[] = idList.split(',').map((id: string) => Number(id))
-
-    try {
-      const orders = await getOrder(ids)
-      const msg: ZZMessage = {
-        op: 'orders',
-        args: orders
-      }
-      res.status(200).json(msg)
-    } catch (e: any) {
-      sendErrorMsg(res, `Failed to fetch orders: ${e.message}`)
-    }
-  })
-
   app.post('/v1/order', async (req, res) => {
     const zzOrderList: ZZOrder[] = Array.isArray(req.body.order) ? req.body.order : [req.body.order]
 

@@ -2,11 +2,9 @@
 import express from 'express'
 import { createServer } from 'http'
 import type { ZZHttpServer } from './types'
-import adminRouts from './routes/admin'
-import marketRouts from './routes/markets'
-import tokenRouts from './routes/tokens'
-import orderRouts from './routes/order'
-import vaultRouts from './routes/vault'
+import marketRoutes from './routes/markets'
+import orderRoutes from './routes/order'
+import vaultRoutes from './routes/vault'
 
 export const createHttpServer = (): ZZHttpServer => {
   const expressApp = express() as any as ZZHttpServer
@@ -22,11 +20,9 @@ export const createHttpServer = (): ZZHttpServer => {
     next()
   })
 
-  adminRouts(expressApp)
-  marketRouts(expressApp)
-  tokenRouts(expressApp)
-  orderRouts(expressApp)
-  vaultRouts(expressApp)
+  marketRoutes(expressApp)
+  orderRoutes(expressApp)
+  vaultRoutes(expressApp)
 
   // expressApp.listen = (...args: any) => server.listen(...args)
 
