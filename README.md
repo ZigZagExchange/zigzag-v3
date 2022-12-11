@@ -2,6 +2,12 @@
 
 Base URL: https://api.zigzag.exchange
 
+## Endpoints
+
+* [GET /v1/markets](#market-info)
+* [GET /v1/orders](#get-orders)
+* [POST /v1/order](#submit-order)
+
 ## Market Info
 
 `GET /v1/markets`
