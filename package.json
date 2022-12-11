@@ -4,7 +4,7 @@
   "description": "Typescript implementation of Zigzag protocol for EVM chains",
   "main": "src/index.ts",
   "scripts": {
-    "test": "ts-node test/api.ts",
+    "test": "jest",
     "dev": "nodemon -x ts-node -e 'ts tsx json' -r ./src/env src/",
     "build": "tsc",
     "start": "ts-node src/index.ts",

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 import Joi from 'joi'
 
+const now = (Date.now() / 1000 | 0)
 export const EVMOrderSchema = Joi.object({
   user: Joi.string().required().messages({
     'string.base': `"user" should be a type of 'string'`,
@@ -25,8 +26,8 @@ export const EVMOrderSchema = Joi.object({
     'string.base': `"buyAmount" should be a type of 'string'`,
     'any.required': `"buyAmount" is a required field`,
   }),
-  expirationTimeSeconds: Joi.string().required().messages({
-    'string.base': `"expirationTimeSeconds" should be a type of 'string'`,
+  expirationTimeSeconds: Joi.number().greater(now).less(now * 2).required().messages({
+    'number.base': `"expirationTimeSeconds" should be a type of 'integer'`,
     'any.required': `"expirationTimeSeconds" is a required field`,
   }),
 })
