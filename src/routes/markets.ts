@@ -17,9 +17,16 @@ export default function marketRoutes(app: ZZHttpServer) {
       verified: (verifiedTokenAddresses.includes(row.buy_token) && verifiedTokenAddresses.includes(row.sell_token)),
     }));
 
+    const tokenInfo = selectTokens.rows.map(row => ({
+      address: row.token_address,
+      symbol: row.token_symbol,
+      decimals: row.token_decimals,
+      name: row.token_name
+    }));
+
     const result = {
       markets,
-      verifiedTokens: selectTokens.rows,
+      verifiedTokens: tokenInfo
     }
 
     res.status(200).json(result)
