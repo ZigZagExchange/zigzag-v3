@@ -230,6 +230,7 @@ describe("Getting orders", () => {
 
   test("buys - successfully", async () => {
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}`)
+    console.log(JSON.stringify(response.body, null, 2))
     await expect(response.statusCode).toBe(200);
     await expect(response.body.orders.length > 0).toBe(true)
     await expect(response.body.orders[0].hash).toBeTruthy()

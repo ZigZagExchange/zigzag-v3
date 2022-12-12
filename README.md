@@ -82,28 +82,28 @@ Base URL: https://api.zigzag.exchange
 {
   "orders": [
     {
-      "id": 1,
+      "hash": "0x731447a4dffa75104b9d9c4502a482565f43babbe462c9767b6e7d8ed0122813",
       "order": {
         "user": "0xc3Be2ecf454A5C74c1218949b4526433a9665fA1",
         "buyToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
         "sellToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         "buyAmount": "1200000000000000000000",
         "sellAmount": "1000000000000000000",
-        "expirationTimeSeconds": "1670795578"
+        "expirationTimeSeconds": "1670880795"
       },
-      "signature": "0x5de9042545420a24abf6ae7729674fa25288f810c9ce39e66e4295fbfc7f0c06499995b04ed90d83100d951c1d66b1ef451b1c0b7b7f7c18023ddea373b5fb2d1b"
+      "signature": "0xb95eba788d8cc58a96ef11092fec08d9e4f6bb9eac42d36201d1e8de7ef77c963103d5e04ced61116a0bb302288000265e663dfce60b471727a7bcea8c0904e31c"
     },
     {
-      "id": 3,
+      "hash": "0x2515f0d72f267489a77212603e0fbd5527ca42d82af778a4bac36059307beb34",
       "order": {
         "user": "0xc3Be2ecf454A5C74c1218949b4526433a9665fA1",
         "buyToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
         "sellToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
         "buyAmount": "1200000000000000000000",
         "sellAmount": "1000000000000000000",
-        "expirationTimeSeconds": "1670795579"
+        "expirationTimeSeconds": "1670880796"
       },
-      "signature": "0x882b17fd322e7f9b790dfdb2b2965a942e59464d62152d80152b423d8b6f9aa811a245f34af56fdaded2910867eb3625264dc85690b189dc2dc99d0d418bea4d1c"
+      "signature": "0xaf9fef368e180ff6094875d73bc12b6e76d77e9903a787093d06aa2dc68834807d76b17788ebca21ef127ab15e42de6476255c919e840fe5c842cb1aa946c2d51c"
     }
   ]
 }
@@ -148,5 +148,5 @@ Content-Type: application/json
 Access-Control-Allow-Origin: *
 Content-Type: application/json
 
-{ id: 1, hash: "0x7bcad1ceab2751cf380fd000facd079682f95b70a93c1bfbf7230a76fd8eacfc" }
+{ hash: "0x7bcad1ceab2751cf380fd000facd079682f95b70a93c1bfbf7230a76fd8eacfc" }
 ```
