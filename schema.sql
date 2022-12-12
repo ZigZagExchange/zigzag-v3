@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS orders (
-    id                 SERIAL         PRIMARY KEY,
+    hash               TEXT           NOT NULL PRIMARY KEY,
     user_address       TEXT           NOT NULL,
     buy_token          TEXT           NOT NULL,
     sell_token         TEXT           NOT NULL,

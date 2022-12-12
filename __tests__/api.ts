@@ -35,14 +35,14 @@ describe("Sending Orders", () => {
       expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
     const signature = await wallet._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
+    const orderHash = await ethers.utils._TypedDataEncoder.hash(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
     const body = { order, signature }
     const response = await request(app)
       .post("/v1/order")
       .set("Content-Type", "application/json")
       .send(body)
     await expect(response.statusCode).toBe(200);
-    await expect(response.body.id).toBeTruthy()
-    await expect(response.body.hash).toBeTruthy()
+    await expect(response.body.hash).toBe(orderHash)
     console.log(response.body);
   });
 
@@ -193,6 +193,29 @@ describe("Sending Orders", () => {
       .send(body)
     await expect(response.statusCode).toBe(400);
     await expect(response.body.err).toBe('Bad signature. You might need the signer field');
+  });
+
+  test("double send order fails", async () => {
+    const order = {
+      user: wallet.address,
+      buyToken: USDC, 
+      sellToken: WETH,
+      buyAmount: ethers.utils.parseEther("1201").toString(),
+      sellAmount: ethers.utils.parseEther("1").toString(),
+      expirationTimeSeconds: ((Date.now() / 1000 | 0) + 42).toString()
+    }
+    const signature = await wallet._signTypedData(EVMConfig.onChainSettings.domain, EVMConfig.onChainSettings.types, order);
+    const body = { order, signature }
+    await request(app)
+      .post("/v1/order")
+      .set("Content-Type", "application/json")
+      .send(body)
+    const response = await request(app)
+      .post("/v1/order")
+      .set("Content-Type", "application/json")
+      .send(body)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('already exists')).toBe(true);
   });
 
 });

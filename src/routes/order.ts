@@ -53,6 +53,7 @@ export default function orderRoutes(app: ZZHttpServer) {
 
     // store in DB
     const values: any[] = [
+      orderHash,
       zzOrder.user,
       zzOrder.buyToken,
       zzOrder.sellToken,
@@ -61,12 +62,17 @@ export default function orderRoutes(app: ZZHttpServer) {
       zzOrder.expirationTimeSeconds,
       modifiedSignature,
     ]
-    const insert = await db.query(
-      'INSERT INTO orders (user_address,buy_token,sell_token,buy_amount,sell_amount,expires,sig) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
-      values
-    )
+    try {
+      await db.query(
+        'INSERT INTO orders (hash,user_address,buy_token,sell_token,buy_amount,sell_amount,expires,sig) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        values
+      )
+    } catch(e: any) {
+      console.error(e);
+      return next(e.detail);
+    }
 
-    res.status(200).json({ id: insert.rows[0].id, hash: orderHash })
+    res.status(200).json({ hash: orderHash })
   })
 
   app.get('/v1/orders', async (req, res, next) => {
@@ -79,13 +85,13 @@ export default function orderRoutes(app: ZZHttpServer) {
 
     const values = [buyToken, sellToken, expires]
     const select = await db.query(
-      `SELECT id, user_address, buy_token, sell_token, CAST(buy_amount AS TEXT) AS buyamount, CAST(sell_amount AS TEXT) AS sellamount, expires, sig 
+      `SELECT hash, user_address, buy_token, sell_token, CAST(buy_amount AS TEXT) AS buyamount, CAST(sell_amount AS TEXT) AS sellamount, expires, sig 
        FROM orders WHERE buy_token = $1 AND sell_token = $2 AND expires < $3`,
       values
     )
 
     const orders = select.rows.map((row) => ({
-      id: row.id,
+      hash: row.hash,
       order: {
         user: row.user_address,
         buyToken: row.buy_token,
