@@ -232,6 +232,7 @@ describe("Getting orders", () => {
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}`)
     await expect(response.statusCode).toBe(200);
     await expect(response.body.orders.length > 0).toBe(true)
+    await expect(response.body.orders[0].hash).toBeTruthy()
     await expect(response.body.orders[0].order.user).toBe(wallet.address)
     await expect(response.body.orders[0].order.buyToken).toBe(USDC)
     await expect(response.body.orders[0].order.sellToken).toBe(WETH)
