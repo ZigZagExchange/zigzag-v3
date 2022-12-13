@@ -27,7 +27,7 @@ expressApp.use('/', (req, res, next) => {
 
 // Log Requests
 expressApp.use((req, res, next) => {
-  console.log(req.method, req.url, req.body)
+  console.log(req.headers.origin, req.method, req.url, req.body)
   next()
 })
 
