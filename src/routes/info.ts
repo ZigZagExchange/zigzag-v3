@@ -4,8 +4,8 @@ import { db } from '../db'
 
 const EVMConfig = JSON.parse(fs.readFileSync('EVMConfig.json', 'utf8'))
 
-export default function marketRoutes(app: ZZHttpServer) {
-  app.get('/v1/markets', async (req, res) => {
+export default function infoRoutes(app: ZZHttpServer) {
+  app.get('/v1/info', async (req, res) => {
     const selectDistinctMarkets = await db.query(
       'SELECT DISTINCT(buy_token, sell_token), buy_token, sell_token FROM orders'
     )

@@ -272,8 +272,8 @@ describe("Getting orders", () => {
 });
 
 describe("Market Info", () => {
-  test("get markets", async () => {
-    const response = await request(app).get("/v1/markets")
+  test("get info", async () => {
+    const response = await request(app).get("/v1/info")
     await expect(response.statusCode).toBe(200);
     await expect(response.body.markets.length).toBeGreaterThanOrEqual(1)
     await expect(response.body.markets[0].verified).toBe(true)

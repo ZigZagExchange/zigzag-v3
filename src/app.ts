@@ -6,7 +6,7 @@ dotenv.config()
 
 import express from 'express'
 import { createServer } from 'http'
-import marketRoutes from './routes/markets'
+import infoRoutes from './routes/info'
 import orderRoutes from './routes/order'
 
 const expressApp = express()
@@ -33,7 +33,7 @@ expressApp.use((req, res, next) => {
 
 // Register routes
 orderRoutes(expressApp)
-marketRoutes(expressApp)
+infoRoutes(expressApp)
 
 // Universal error handler
 expressApp.use((err, req, res, next) => {

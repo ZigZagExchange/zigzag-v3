@@ -4,13 +4,13 @@ Base URL: http://api.arbitrum.zigzag.exchange
 
 ## Endpoints
 
-* [GET /v1/markets](#market-info)
+* [GET /v1/info](#market-info)
 * [GET /v1/orders](#get-orders)
 * [POST /v1/order](#submit-order)
 
 ## Market Info
 
-`GET /v1/markets`
+`GET /v1/info`
 
 ```
 {
@@ -121,7 +121,7 @@ Base URL: http://api.arbitrum.zigzag.exchange
 * `order.sellToken`: The address of the token being sold     
 * `order.buyAmount`: The quantity of buyToken being bought as a uint256 string    
 * `order.sellAmount`: The quantity of sellToken being sold as a uint256 string    
-* `signature`: Orders must be signed. To generate the signature, use the `domain` and `types` info in `GET /v1/markets`, then use something like [ethers.utils.signTypedData](https://docs.ethers.org/v5/api/signer/#Signer-signTypedData) to generate an EIP-712 signature.     
+* `signature`: Orders must be signed. To generate the signature, use the `domain` and `types` info in `GET /v1/info`, then use something like [ethers.utils.signTypedData](https://docs.ethers.org/v5/api/signer/#Signer-signTypedData) to generate an EIP-712 signature.     
 * `signer`: (optional) Most users will not need this. Smart contracts will usually have a designated signer. They can use this field to pass in the address of the authorized signer for signature verification.   
 
 **Example**
