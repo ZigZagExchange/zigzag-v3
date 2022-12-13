@@ -7,8 +7,8 @@
     "test": "jest",
     "dev": "nodemon -x ts-node -e 'ts tsx json' -r ./src/env src/",
     "build": "tsc",
-    "start": "ts-node src/index.ts",
-    "background": "ts-node -r ./src/env ./src/background.ts"
+    "start": "ts-node ./src/index.ts",
+    "background": "ts-node ./src/background.ts"
   },
   "repository": {
     "type": "git",
