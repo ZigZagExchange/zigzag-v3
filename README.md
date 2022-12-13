@@ -1,6 +1,6 @@
 # ZigZag API
 
-Base URL: https://api.zigzag.exchange
+Base URL: https://api.arbitrum.zigzag.exchange
 
 ## Endpoints
 
