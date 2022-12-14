@@ -9,34 +9,40 @@ on:
   pull_request:
     branches: [master]
 
+    name: PostgreSQL service example
+on: push
+
 jobs:
-  build:
+  container-job:
     runs-on: ubuntu-latest
+    container: node:current
+
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: zigzag
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Build Backend
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.17.1'
-          cache: 'yarn'
-      - run: yarn install
-      - run: yarn run build
-      - name: Run Tests
-        run: yarn run test
-        env: 
-          DATABASE_URL: postgresql://postgres:postgres@postgres:${{ job.services.postgres.ports[5432] }}/zigzag
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Connect to PostgreSQL
+        run: npm run test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+          # The hostname used to communicate with the PostgreSQL service container
+          POSTGRES_HOST: postgres
+          # The default PostgreSQL port
+          POSTGRES_PORT: 5432
