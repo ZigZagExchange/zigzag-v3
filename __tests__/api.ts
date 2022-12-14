@@ -1,7 +1,7 @@
 import request from "supertest"
 import { ethers } from "ethers"
 import app from "../src/app"
-import { db, runDbMigration } from "../src/db"
+import { db, runDbMigration, removeExpiredOrders } from "../src/db"
 import fs from 'fs'
 
 const EVMConfig = JSON.parse(fs.readFileSync('EVMConfig.json', 'utf8'))
@@ -291,6 +291,12 @@ describe("Market Info", () => {
     await expect(response.body.exchange.takerVolumeFee).toBeGreaterThanOrEqual(0)
     await expect(response.body.exchange.types).toBeTruthy()
     await expect(response.body.exchange.types.Order).toBeTruthy()
+  });
+});
+
+describe("Background Tasks", () => {
+  test("expire old orders", async () => {
+    await removeExpiredOrders();
   });
 });
 

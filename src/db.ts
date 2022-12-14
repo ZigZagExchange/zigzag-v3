@@ -26,3 +26,10 @@ export async function runDbMigration() {
     console.error(`Failed to run db migration: ${err}`)
   }
 }
+
+export async function removeExpiredOrders() {
+  await db.query(
+    "DELETE FROM orders WHERE expires < EXTRACT(EPOCH FROM (NOW() + INTERVAL '3 SECONDS'))"
+  )
+}
+
