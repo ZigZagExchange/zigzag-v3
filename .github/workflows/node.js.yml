@@ -5,18 +5,23 @@ name: Node.js CI
 
 on:
   push:
-    branches: [master, prod]
+    branches: [master]
   pull_request:
-    branches: [master, prod]
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    services: 
+    services:
       postgres:
         image: postgres
-        env: 
+        env:
           POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - uses: actions/checkout@v2
