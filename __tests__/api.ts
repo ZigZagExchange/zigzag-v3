@@ -13,6 +13,7 @@ const wallet = new ethers.Wallet("0xf1c6a46e12f76cb6d8b5b78f5c2a46dd68d05eaee7ff
 const wallet2 = new ethers.Wallet("0xa8f70284bf6be99ec73512e00441528be2d020f1f8c0f11ac46d4045517d9346");
 
 beforeAll(async () => {
+  await runDbMigration()
   await db.query("DROP TABLE orders");
   await db.query("DROP TABLE token_info");
   await runDbMigration()

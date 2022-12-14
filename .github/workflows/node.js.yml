@@ -3,11 +3,7 @@
 
 name: Node.js CI
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+on: push
 
 jobs:
   build_and_test:
@@ -36,10 +32,6 @@ jobs:
         run: yarn run build
 
       - name: Test
-        run: npm run test
+        run: yarn run test
         env:
           DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
-          # The hostname used to communicate with the PostgreSQL service container
-          POSTGRES_HOST: postgres
-          # The default PostgreSQL port
-          POSTGRES_PORT: 5432
