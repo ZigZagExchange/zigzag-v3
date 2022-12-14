@@ -38,7 +38,7 @@ jobs:
       - name: Test
         run: npm run test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?ssl=false
+          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres?sslmode=disable
           # The hostname used to communicate with the PostgreSQL service container
           POSTGRES_HOST: postgres
           # The default PostgreSQL port
