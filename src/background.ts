@@ -8,7 +8,7 @@ async function start() {
 
 async function removeExpiredOrders() {
   await db.query(
-    "DELETE FROM orders WHERE expires < (NOW() + INTERVAL '3 SECONDS')"
+    "DELETE FROM orders WHERE expires < EXTRACT(EPOCH FROM (NOW() + INTERVAL '3 SECONDS'))"
   )
 }
 
