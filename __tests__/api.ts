@@ -163,7 +163,7 @@ describe("Sending Orders", () => {
       user: wallet.address,
       buyToken: USDC, 
       sellToken: WETH,
-      buyAmount: ethers.utils.parseEther("1200").toString(),
+      buyAmount: ethers.utils.parseEther("1203").toString(),
       sellAmount: ethers.utils.parseEther("1").toString(),
       expirationTimeSeconds: ((Date.now() / 1000 | 0) + 20).toString()
     }
@@ -267,6 +267,20 @@ describe("Getting orders", () => {
     const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
     await expect(response.statusCode).toBe(200);
     await expect(response.body.orders.length > 0).toBe(true)
+  });
+
+  test("with too early expires", async () => {
+    const expires = (Date.now() / 1000 | 0) - 100;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('Min value of expires')).toBe(true)
+  });
+
+  test("with too late expires", async () => {
+    const expires = (Date.now() / 1000 | 0) * 10;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('Max value of expires')).toBe(true)
   });
 
 });

@@ -78,17 +78,26 @@ export default function orderRoutes(app: ZZHttpServer) {
   app.get('/v1/orders', async (req, res, next) => {
     let { buyToken, sellToken } = req.query
     let expires: any = req.query.expires
+    const now = (Date.now() / 1000 | 0)
     if (!buyToken) return next('Missing query arg buyToken')
     if (!sellToken) return next('Missing query arg sellToken')
-    if (!expires) expires = ((Date.now() / 1000) | 0) + 30
+    if (!expires) expires = now + 30;
+    if (Number(expires) > now * 2) return next(`Max value of expires is ${now * 2}`);
+    if (Number(expires) < now) return next(`Min value of expires is ${now}`);
     expires = Number(expires)
 
     const values = [buyToken, sellToken, expires]
-    const select = await db.query(
-      `SELECT hash, user_address, buy_token, sell_token, CAST(buy_amount AS TEXT) AS buyamount, CAST(sell_amount AS TEXT) AS sellamount, expires, sig 
-       FROM orders WHERE buy_token = $1 AND sell_token = $2 AND expires < $3`,
-      values
-    )
+    let select;
+    try {
+      select = await db.query(
+        `SELECT hash, user_address, buy_token, sell_token, CAST(buy_amount AS TEXT) AS buyamount, CAST(sell_amount AS TEXT) AS sellamount, expires, sig 
+         FROM orders WHERE buy_token = $1 AND sell_token = $2 AND expires < $3`,
+        values
+      )
+    } catch (e: any) {
+      console.error(e);
+      return next(e.detail);
+    }
 
     const orders = select.rows.map((row) => ({
       hash: row.hash,
