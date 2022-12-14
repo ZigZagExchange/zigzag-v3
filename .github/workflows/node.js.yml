@@ -17,7 +17,6 @@ jobs:
         image: postgres
         env: 
           POSTGRES_PASSWORD: postgres
-        options: -d zigzag
 
     steps:
       - uses: actions/checkout@v2
@@ -31,4 +30,4 @@ jobs:
       - name: Run Tests
         run: yarn run test
         env: 
-          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/zigzag
+          DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
