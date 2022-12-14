@@ -3,9 +3,9 @@ CREATE TABLE IF NOT EXISTS orders (
     user_address       TEXT           NOT NULL,
     buy_token          TEXT           NOT NULL,
     sell_token         TEXT           NOT NULL,
-    buy_amount         NUMERIC(50,0)  CHECK (buy_amount > 0),
-    sell_amount        NUMERIC(50,0)  CHECK (sell_amount > 0),
-    expires            BIGINT         NOT NULL,
+    buy_amount         NUMERIC(50,0)  NOT NULL CHECK (buy_amount > 0),
+    sell_amount        NUMERIC(50,0)  NOT NULL CHECK (sell_amount > 0),
+    expires            INTEGER        NOT NULL,
     filled             NUMERIC(50,0)  DEFAULT 0 CHECK (filled <= sell_amount),
     sig                TEXT           NOT NULL
 );
