@@ -12,6 +12,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    services: 
+      postgres:
+        image: postgres
+        env: 
+          POSTGRES_PASSWORD: postgres
+        options: -d zigzag
 
     steps:
       - uses: actions/checkout@v2
@@ -22,4 +28,7 @@ jobs:
           cache: 'yarn'
       - run: yarn install
       - run: yarn run build
-      - run: yarn run test
+      - name: Run Tests
+        run: yarn run test
+        env: 
+        DATABASE_URL: postgresql://postgres:postgres@postgres:5432/zigzag
