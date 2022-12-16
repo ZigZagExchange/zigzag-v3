@@ -4,6 +4,7 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
+import compression from 'compression'
 import express from 'express'
 import { createServer } from 'http'
 import infoRoutes from './routes/info'
@@ -13,6 +14,7 @@ const expressApp = express()
 const server = createServer(expressApp)
 
 expressApp.use(express.json())
+expressApp.use(compression())
 
 // CORS
 expressApp.use('/', (req, res, next) => {
