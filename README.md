@@ -70,8 +70,8 @@ Base URL: http://api.arbitrum.zigzag.exchange
 
 **Query paramaters**:
 
-* `buyToken`: Address of token being purchased   
-* `sellToken`: Address of token being sold   
+* `buyToken`: Address of token being purchased. Can take multiple comma seperated values.    
+* `sellToken`: Address of token being sold. Can take multiple comma seperated values.   
 * `expires`: (optional) UNIX timestamp of latest expiry you want to see. Defaults to 30 seconds past the current time.    
 
 **Example:**
@@ -108,6 +108,11 @@ Base URL: http://api.arbitrum.zigzag.exchange
   ]
 }
 ```
+
+**Other Examples:**
+
+`GET /v1/orders?buyToken=0x82af49447d8a07e3bd95bd0d56f35241523fbab1&sellToken=0xff970a61a04b1ca14834a43f5de4533ebddb5cc8&expires=1671152930`    
+`GET /v1/orders?buyToken=0x82af49447d8a07e3bd95bd0d56f35241523fbab1,0xff970a61a04b1ca14834a43f5de4533ebddb5cc8&sellToken=0xff970a61a04b1ca14834a43f5de4533ebddb5cc8,0x82af49447d8a07e3bd95bd0d56f35241523fbab1`    
 
 
 ## Submit Order

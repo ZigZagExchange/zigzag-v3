@@ -245,6 +245,17 @@ describe("Getting orders", () => {
     await expect(response.body.orders[0].signature).toBeTruthy()
   });
 
+  test("double sided - successfully", async () => {
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC},${WETH}&sellToken=${WETH},${USDC}`)
+    console.log(JSON.stringify(response.body, null, 2))
+    const buyTokens = response.body.orders.map(o => o.order.buyToken.toLowerCase());
+    const sellTokens = response.body.orders.map(o => o.order.sellToken.toLowerCase());
+    await expect(buyTokens.includes(USDC.toLowerCase())).toBe(true);
+    await expect(buyTokens.includes(WETH.toLowerCase())).toBe(true);
+    await expect(sellTokens.includes(USDC.toLowerCase())).toBe(true);
+    await expect(sellTokens.includes(WETH.toLowerCase())).toBe(true);
+  });
+
   test("fails without any args", async () => {
     const response = await request(app).get("/v1/orders")
     await expect(response.statusCode).toBe(400);
