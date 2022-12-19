@@ -274,25 +274,46 @@ describe("Getting orders", () => {
     await expect(response.body.err).toBe("Missing query arg buyToken")
   });
 
-  test("with expires", async () => {
+  test("with maxExpires", async () => {
     const expires = (Date.now() / 1000 | 0) + 100000;
-    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&maxExpires=${expires}`)
     await expect(response.statusCode).toBe(200);
     await expect(response.body.orders.length > 0).toBe(true)
   });
 
-  test("with too early expires", async () => {
-    const expires = (Date.now() / 1000 | 0) - 100;
-    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
-    await expect(response.statusCode).toBe(400);
-    await expect(response.body.err.includes('Min value of expires')).toBe(true)
+  test("with minExpires", async () => {
+    const expires = (Date.now() / 1000 | 0) + 10;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&minExpires=${expires}`)
+    await expect(response.statusCode).toBe(200);
+    await expect(response.body.orders.length > 0).toBe(true)
   });
 
-  test("with too late expires", async () => {
-    const expires = (Date.now() / 1000 | 0) * 10;
-    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&expires=${expires}`)
+  test("with too early maxExpires", async () => {
+    const expires = (Date.now() / 1000 | 0) - 100;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&maxExpires=${expires}`)
     await expect(response.statusCode).toBe(400);
-    await expect(response.body.err.includes('Max value of expires')).toBe(true)
+    await expect(response.body.err.includes('Min value of maxExpires')).toBe(true)
+  });
+
+  test("with too late minExpires", async () => {
+    const expires = (Date.now() / 1000 | 0) * 10;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&maxExpires=${expires}`)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('Max value of maxExpires')).toBe(true)
+  });
+
+  test("with too early maxExpires", async () => {
+    const expires = (Date.now() / 1000 | 0) - 100;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&minExpires=${expires}`)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('Min value of minExpires')).toBe(true)
+  });
+
+  test("with too late minExpires", async () => {
+    const expires = (Date.now() / 1000 | 0) * 10;
+    const response = await request(app).get(`/v1/orders?buyToken=${USDC}&sellToken=${WETH}&minExpires=${expires}`)
+    await expect(response.statusCode).toBe(400);
+    await expect(response.body.err.includes('Max value of minExpires')).toBe(true)
   });
 
 });

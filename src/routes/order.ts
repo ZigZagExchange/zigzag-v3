@@ -76,24 +76,29 @@ export default function orderRoutes(app: ZZHttpServer) {
   })
 
   app.get('/v1/orders', async (req, res, next) => {
-    let expires: any = req.query.expires
+    let maxExpires: any = req.query.maxExpires
+    let minExpires: any = req.query.minExpires
     const now = (Date.now() / 1000 | 0)
     if (!req.query.buyToken) return next('Missing query arg buyToken')
     if (!req.query.sellToken) return next('Missing query arg sellToken')
-    if (!expires) expires = now + 30;
-    if (Number(expires) > now * 2) return next(`Max value of expires is ${now * 2}`);
-    if (Number(expires) < now) return next(`Min value of expires is ${now}`);
-    expires = Number(expires)
+    if (!maxExpires) maxExpires = now + 60;
+    if (!minExpires) minExpires = now + 3;
+    if (Number(maxExpires) > now * 2) return next(`Max value of maxExpires is ${now * 2}`);
+    if (Number(maxExpires) < now) return next(`Min value of maxExpires is ${now}`);
+    if (Number(minExpires) > now * 2) return next(`Max value of minExpires is ${now * 2}`);
+    if (Number(minExpires) < now) return next(`Min value of minExpires is ${now}`);
+    maxExpires = Number(maxExpires)
+    minExpires = Number(minExpires)
 
     let buyTokens: string[] = (req.query.buyToken as string).split(',');
     let sellTokens: string[] = (req.query.sellToken as string).split(',');
 
-    const values = [buyTokens, sellTokens, expires]
+    const values = [buyTokens, sellTokens, minExpires, maxExpires]
     let select;
     try {
       select = await db.query(
         `SELECT hash, user_address, buy_token, sell_token, CAST(buy_amount AS TEXT) AS buyamount, CAST(sell_amount AS TEXT) AS sellamount, expires, sig 
-         FROM orders WHERE buy_token=ANY($1) AND sell_token= ANY($2) AND expires < $3`,
+         FROM orders WHERE buy_token=ANY($1) AND sell_token= ANY($2) AND expires >= $3 AND expires <= $4`,
         values
       )
     } catch (e: any) {
