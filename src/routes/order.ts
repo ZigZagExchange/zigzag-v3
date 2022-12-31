@@ -18,13 +18,17 @@ export default function orderRoutes(app: ZZHttpServer) {
     let signature: string = req.body.signature
     const signer: string = req.body.signer || req.body.order.user
 
+    // parse incomming tokens to lower case
+    zzOrder.sellToken = zzOrder.sellToken.toLowerCase()
+    zzOrder.buyToken = zzOrder.buyToken.toLowerCase()
+
     // field validations
     if (!signature) return next('missing signature')
     if (Number(zzOrder.sellAmount) <= 0)
       return next('sellAmount must be positive')
     if (Number(zzOrder.buyAmount) <= 0)
       return next('buyAmount must be positive')
-    if (zzOrder.sellToken.toLowerCase() === zzOrder.buyToken.toLowerCase())
+    if (zzOrder.sellToken === zzOrder.buyToken)
       return next(`Can't buy and sell the same token`)
     if (Number(zzOrder.expirationTimeSeconds) < Date.now() / 1000 + 5)
       return next('Expiry time too low. Use at least NOW + 5sec')
