@@ -16,11 +16,12 @@ export default function orderRoutes(app: ZZHttpServer) {
 
     // grab signature data
     let signature: string = req.body.signature
-    const signer: string = req.body.signer || req.body.order.user
+    let signer: string = req.body.signer || req.body.order.user
 
-    // parse incomming tokens to lower case
+    // parse incomming data to lower case
     zzOrder.sellToken = zzOrder.sellToken.toLowerCase()
     zzOrder.buyToken = zzOrder.buyToken.toLowerCase()
+    signer = signer.toLowerCase()
 
     // field validations
     if (!signature) return next('missing signature')
