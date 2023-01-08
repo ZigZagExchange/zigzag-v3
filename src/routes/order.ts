@@ -24,6 +24,8 @@ export default function orderRoutes(app: ZZHttpServer) {
     signer = signer.toLowerCase()
 
     // field validations
+    const now = (Date.now() / 1000 | 0)
+    
     if (!signature) return next('missing signature')
     if (Number(zzOrder.sellAmount) <= 0)
       return next('sellAmount must be positive')
@@ -31,7 +33,9 @@ export default function orderRoutes(app: ZZHttpServer) {
       return next('buyAmount must be positive')
     if (zzOrder.sellToken === zzOrder.buyToken)
       return next(`Can't buy and sell the same token`)
-    if (Number(zzOrder.expirationTimeSeconds) < Date.now() / 1000 + 5)
+    if (Number(zzOrder.expirationTimeSeconds) < now)
+      return next(`Min value of expirationTimeSeconds is ${now}`);
+    if (Number(zzOrder.expirationTimeSeconds) < now + 5)
       return next('Expiry time too low. Use at least NOW + 5sec')
     if (!ethers.utils.isAddress(zzOrder.user))
       return next('order.user is invalid address')
